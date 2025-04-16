@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 
-// Paleta de colores sugerida para Agenda Glam (tema oscuro)
-const Color _primaryColor = Color(0xFF1A1A1A); // Negro/Gris muy oscuro
-const Color _accentColor = Color(0xFFBB86FC);  // Un toque de color violeta (puede ajustarse)
-const Color _backgroundColor = Color(0xFF121212); // Fondo oscuro
-const Color _surfaceColor = Color(0xFF1E1E1E);   // Superficies ligeramente más claras
-const Color _textColor = Color(0xFFE0E0E0);      // Texto claro
-const Color _secondaryTextColor = Color(0xFFB0B0B0); // Texto secundario
-const Color _errorColor = Color(0xFFCF6679);      // Color de error estándar en temas oscuros
+// Paleta de colores para Agenda Glam (Elegante Oscura)
+const Color _primaryColor = Color(0xFF0A1128);    // Azul marino profundo (AppBar)
+const Color _accentColor = Color(0xFFFFC107);     // Dorado/Ámbar (Acento/Botones)
+const Color _backgroundColor = Color(0xFF050A14);  // Negro azulado muy oscuro (Fondo)
+const Color _surfaceColor = Color(0xFF1E2A3B);     // Gris azulado oscuro (Superficies/Cards)
+const Color _textColor = Color(0xFFFFFFFF);        // Blanco (Texto principal)
+const Color _secondaryTextColor = Color(0xFFB0B8C1); // Gris plateado (Texto secundario)
+const Color _errorColor = Color(0xFFCF6679);       // Rojo error oscuro
+const Color _onPrimaryColor = _textColor;          // Texto sobre primario
+const Color _onAccentColor = Colors.black;         // Texto sobre acento (negro sobre dorado)
+const Color _onBackgroundColor = _textColor;       // Texto sobre fondo
+const Color _onSurfaceColor = _textColor;          // Texto sobre superficie
+const Color _onErrorColor = Colors.black;          // Texto sobre error
+
+// Color con opacidad para usar en varios lugares
+final Color _accentColorWithOpacity = _accentColor.withOpacity(0.4);
+final Color _secondaryTextColorWithOpacity = _secondaryTextColor.withOpacity(0.7);
+final Color _surfaceColorWithOpacity = _surfaceColor.withOpacity(0.7);
+final Color _accentColorLightBg = _accentColor.withOpacity(0.2);
+final Color _blackWithOpacity = Colors.black.withOpacity(0.3);
 
 final ThemeData appTheme = ThemeData(
   brightness: Brightness.dark,
@@ -15,66 +27,180 @@ final ThemeData appTheme = ThemeData(
   scaffoldBackgroundColor: _backgroundColor,
   colorScheme: const ColorScheme.dark(
     primary: _primaryColor,
-    secondary: _accentColor, // Accent color
+    secondary: _accentColor,
     background: _backgroundColor,
     surface: _surfaceColor,
-    onPrimary: _textColor, // Color del texto sobre primario
-    onSecondary: Colors.black, // Color del texto sobre secundario
-    onBackground: _textColor, // Color del texto sobre fondo
-    onSurface: _textColor, // Color del texto sobre superficies
+    onPrimary: _onPrimaryColor,
+    onSecondary: _onAccentColor,
+    onBackground: _onBackgroundColor,
+    onSurface: _onSurfaceColor,
     error: _errorColor,
-    onError: Colors.black, // Color del texto sobre error
+    onError: _onErrorColor,
   ),
   appBarTheme: const AppBarTheme(
-    color: _primaryColor,
-    elevation: 0, // Sin sombra por defecto
-    iconTheme: IconThemeData(color: _textColor),
+    backgroundColor: _primaryColor,
+    elevation: 2, // Ligera elevación para dar profundidad
+    shadowColor: Colors.black45, // Sombra sutil
+    iconTheme: IconThemeData(color: _onPrimaryColor),
     titleTextStyle: TextStyle(
-      color: _textColor,
+      color: _onPrimaryColor,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
+      letterSpacing: 0.5, // Espaciado de letras para elegancia
     ),
+    centerTitle: true, // Centrar título por defecto
   ),
   textTheme: const TextTheme(
-    headlineLarge: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
-    headlineMedium: TextStyle(color: _textColor, fontWeight: FontWeight.w600),
-    headlineSmall: TextStyle(color: _textColor, fontWeight: FontWeight.w500),
-    bodyLarge: TextStyle(color: _textColor),
-    bodyMedium: TextStyle(color: _secondaryTextColor),
-    labelLarge: TextStyle(color: _accentColor, fontWeight: FontWeight.bold), // Para botones, etc.
+    // Títulos
+    displayLarge: TextStyle(color: _textColor, fontWeight: FontWeight.w300, letterSpacing: 0.5),
+    displayMedium: TextStyle(color: _textColor, fontWeight: FontWeight.w300, letterSpacing: 0.5),
+    displaySmall: TextStyle(color: _textColor, fontWeight: FontWeight.w400, letterSpacing: 0.5),
+    
+    // Encabezados
+    headlineLarge: TextStyle(color: _textColor, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+    headlineMedium: TextStyle(color: _textColor, fontWeight: FontWeight.w600, letterSpacing: 0.25),
+    headlineSmall: TextStyle(color: _textColor, fontWeight: FontWeight.w500, letterSpacing: 0.25),
+    
+    // Cuerpo de texto
+    bodyLarge: TextStyle(color: _textColor, letterSpacing: 0.15),
+    bodyMedium: TextStyle(color: _secondaryTextColor, letterSpacing: 0.15),
+    bodySmall: TextStyle(color: _secondaryTextColor, letterSpacing: 0.1),
+    
+    // Etiquetas y botones
+    labelLarge: TextStyle(color: _accentColor, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+    labelMedium: TextStyle(color: _accentColor, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+    labelSmall: TextStyle(color: _secondaryTextColor, fontWeight: FontWeight.w500, letterSpacing: 0.5),
   ),
-  buttonTheme: ButtonThemeData(
-    buttonColor: _accentColor,
-    textTheme: ButtonTextTheme.primary, // Usa color de texto adecuado para el botón
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8.0),
-    ),
-  ),
+  
+  // Botones elevados (principales)
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: _accentColor,
-      foregroundColor: Colors.black, // Texto del botón
+      foregroundColor: _onAccentColor,
+      elevation: 3, // Mayor elevación para destacar
+      shadowColor: _accentColorWithOpacity, // Sombra del color de acento
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.bold,
+        letterSpacing: 0.5,
+      ),
+    ),
+  ),
+  
+  // Botones de texto (secundarios)
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      foregroundColor: _accentColor,
+      textStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+      ),
+    ),
+  ),
+  
+  // Botones con contorno
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: _accentColor,
+      side: const BorderSide(color: _accentColor, width: 1.5),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
     ),
   ),
+  
+  // Campos de texto
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: _surfaceColor,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8.0),
       borderSide: BorderSide.none,
     ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      borderSide: const BorderSide(color: _accentColor, width: 2.0),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      borderSide: const BorderSide(color: _errorColor, width: 1.0),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      borderSide: const BorderSide(color: _errorColor, width: 2.0),
+    ),
     labelStyle: const TextStyle(color: _secondaryTextColor),
-    hintStyle: const TextStyle(color: _secondaryTextColor),
+    hintStyle: TextStyle(color: _secondaryTextColorWithOpacity),
+    prefixIconColor: _secondaryTextColor,
+    suffixIconColor: _secondaryTextColor,
   ),
+  
+  // Tarjetas
   cardTheme: CardTheme(
-    color: _surfaceColor,
-    elevation: 2,
+    elevation: 4,
+    shadowColor: _blackWithOpacity,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12.0),
     ),
+    color: _surfaceColor,
+    clipBehavior: Clip.antiAlias, // Para imágenes y contenido que podría desbordar
   ),
-  // Puedes añadir más personalizaciones aquí (FloatingActionButton, etc.)
+  
+  // Diálogos
+  dialogTheme: DialogTheme(
+    backgroundColor: _surfaceColor,
+    elevation: 8,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.0),
+    ),
+  ),
+  
+  // Chips
+  chipTheme: ChipThemeData(
+    backgroundColor: _surfaceColor,
+    disabledColor: _surfaceColorWithOpacity,
+    selectedColor: _accentColorLightBg,
+    secondarySelectedColor: _accentColor,
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    labelStyle: const TextStyle(color: _textColor),
+    secondaryLabelStyle: const TextStyle(color: _onAccentColor),
+    brightness: Brightness.dark,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.0),
+      side: const BorderSide(color: _accentColor, width: 1),
+    ),
+  ),
+  
+  // Iconos
+  iconTheme: const IconThemeData(
+    color: _secondaryTextColor,
+    size: 24,
+  ),
+  
+  // Divisores
+  dividerTheme: const DividerThemeData(
+    color: Color(0xFF2D3A4A), // Un poco más claro que el color de superficie
+    thickness: 1,
+    space: 24,
+  ),
+  
+  // SnackBar
+  snackBarTheme: SnackBarThemeData(
+    backgroundColor: _surfaceColor,
+    contentTextStyle: const TextStyle(color: _textColor),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+    behavior: SnackBarBehavior.floating,
+    actionTextColor: _accentColor,
+  ),
 );
