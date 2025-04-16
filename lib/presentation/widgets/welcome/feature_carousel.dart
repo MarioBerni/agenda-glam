@@ -18,11 +18,7 @@ class FeatureCarousel extends StatefulWidget {
   final List<CarouselItem> items;
   final double height;
 
-  const FeatureCarousel({
-    super.key,
-    required this.items,
-    this.height = 240,
-  });
+  const FeatureCarousel({super.key, required this.items, this.height = 240});
 
   @override
   State<FeatureCarousel> createState() => _FeatureCarouselState();
@@ -42,10 +38,10 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // Colores con opacidad
-    final blackWithOpacity = Colors.black.withOpacity(0.5);
-    
+    final blackWithOpacity = Colors.black.withAlpha(128); // 0.5 * 255 = 128
+
     return SizedBox(
       height: widget.height,
       child: Stack(
@@ -84,7 +80,7 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
                           child: Icon(
                             Icons.image,
                             size: 64,
-                            color: colorScheme.onSurface.withOpacity(0.3),
+                            color: colorScheme.onSurface.withAlpha(77), // 0.3 * 255 = 77
                           ),
                         ),
                       ),
@@ -96,7 +92,7 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withAlpha(179), // 0.7 * 255 = 179
                             ],
                             stops: const [0.6, 1.0],
                           ),
@@ -120,7 +116,7 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
                             Text(
                               widget.items[index].description,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withAlpha(230), // 0.9 * 255 = 230
                               ),
                             ),
                           ],
@@ -132,7 +128,7 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
               );
             },
           ),
-          
+
           // Indicadores de página
           Positioned(
             bottom: 10,
@@ -148,9 +144,10 @@ class _FeatureCarouselState extends State<FeatureCarousel> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _currentPage == index
-                        ? colorScheme.secondary
-                        : colorScheme.onBackground.withOpacity(0.3),
+                    color:
+                        _currentPage == index
+                            ? colorScheme.secondary
+                            : colorScheme.onSurface.withAlpha(77), // 0.3 * 255 = 77
                   ),
                 ),
               ),

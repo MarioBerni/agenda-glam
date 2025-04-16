@@ -44,7 +44,8 @@ class WelcomePage extends StatelessWidget {
       BenefitItem(
         icon: Icons.star,
         title: 'Servicios Premium',
-        description: 'Accede a los mejores profesionales y servicios exclusivos',
+        description:
+            'Accede a los mejores profesionales y servicios exclusivos',
       ),
       BenefitItem(
         icon: Icons.local_offer,
@@ -70,8 +71,10 @@ class WelcomePage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.background,
-              const Color(0xFF0A1A30), // Un tono ligeramente más claro para el gradiente
+              Theme.of(context).colorScheme.surface,
+              const Color(
+                0xFF0A1A30,
+              ), // Un tono ligeramente más claro para el gradiente
             ],
           ),
         ),
@@ -82,10 +85,10 @@ class WelcomePage extends StatelessWidget {
               children: [
                 // Encabezado con logo y nombre
                 const WelcomeHeader(),
-                
+
                 // Carrusel principal de características
                 FeatureCarousel(items: carouselItems),
-                
+
                 // Botones de acción
                 ActionButtons(
                   onRegister: () {
@@ -98,19 +101,16 @@ class WelcomePage extends StatelessWidget {
                     showLoginModal(context);
                   },
                 ),
-                
+
                 // Sección de beneficios
                 BenefitsGrid(
                   title: 'Por qué elegir Agenda Glam',
                   benefits: benefits,
                 ),
-                
+
                 // Sección de socios/marcas
-                PartnersCarousel(
-                  title: 'Nuestros Socios',
-                  partners: partners,
-                ),
-                
+                PartnersCarousel(title: 'Nuestros Socios', partners: partners),
+
                 // Espacio inferior
                 const SizedBox(height: 32),
               ],

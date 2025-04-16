@@ -1,28 +1,46 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
+# Este archivo configura el analizador, que analiza estáticamente el código Dart
+# para verificar errores, advertencias y lints.
 #
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# Los problemas identificados por el analizador se muestran en la interfaz de usuario
+# de los IDEs habilitados para Dart. El analizador también se puede invocar desde
+# la línea de comandos ejecutando `flutter analyze`.
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
+# La siguiente línea activa un conjunto de lints recomendados para aplicaciones Flutter,
+# paquetes y plugins diseñados para fomentar buenas prácticas de codificación.
 include: package:flutter_lints/flutter.yaml
 
 linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
+  # Las reglas de lint aplicadas a este proyecto se pueden personalizar en la
+  # sección a continuación para deshabilitar reglas de `package:flutter_lints/flutter.yaml`
+  # o para habilitar reglas adicionales.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Estilo y formato
+    prefer_single_quotes: true        # Usar comillas simples en lugar de dobles
+    require_trailing_commas: true     # Requiere comas finales para mejorar la legibilidad en git
+    sort_child_properties_last: true  # Propiedades child al final en widgets
+    
+    # Buenas prácticas
+    avoid_print: true                 # Evitar print() en código de producción
+    prefer_const_constructors: true   # Usar constructores const cuando sea posible
+    prefer_final_locals: true         # Preferir variables locales final
+    avoid_redundant_argument_values: true  # Evitar valores de argumentos redundantes
+    
+    # Rendimiento
+    avoid_unnecessary_containers: true  # Evitar Containers innecesarios
+    use_key_in_widget_constructors: true  # Usar key en constructores de widgets
+    
+    # Accesibilidad
+    use_full_hex_values_for_flutter_colors: true  # Usar valores hex completos para colores
 
-# Additional information about this file can be found at
+analyzer:
+  errors:
+    # Tratar algunos lints como warnings en lugar de errores
+    prefer_const_constructors: warning
+    prefer_final_locals: warning
+  exclude:
+    # Excluir archivos generados automáticamente
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+# Información adicional sobre este archivo se puede encontrar en
 # https://dart.dev/guides/language/analysis-options

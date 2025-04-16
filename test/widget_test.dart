@@ -1,30 +1,25 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Prueba básica para verificar que la página de bienvenida se carga correctamente
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agenda_glam/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Verificar que la página de bienvenida se carga correctamente', (
+    WidgetTester tester,
+  ) async {
+    // Construir nuestra app y generar un frame
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verificar que la página de bienvenida se muestra correctamente
+    // Buscamos elementos clave que deberían estar presentes en la página de bienvenida
+    expect(find.text('QUIERO AGENDARME'), findsOneWidget);
+    expect(find.text('INICIAR SESIÓN'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verificar que se muestra la sección de beneficios
+    expect(find.text('Por qué elegir Agenda Glam'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verificar que se muestra la sección de socios
+    expect(find.text('Nuestros Socios'), findsOneWidget);
   });
 }

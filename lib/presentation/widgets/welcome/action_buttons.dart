@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ActionButtons extends StatelessWidget {
   final VoidCallback onRegister;
   final VoidCallback onLogin;
-  
+
   const ActionButtons({
     super.key,
     required this.onRegister,

@@ -26,17 +26,13 @@ class _LoginModalState extends State<LoginModal> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final size = MediaQuery.of(context).size;
-    
+
     return Container(
       // Altura máxima del 90% de la pantalla
-      constraints: BoxConstraints(
-        maxHeight: size.height * 0.9,
-      ),
+      constraints: BoxConstraints(maxHeight: size.height * 0.9),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SingleChildScrollView(
         child: Padding(
@@ -54,12 +50,12 @@ class _LoginModalState extends State<LoginModal> {
                     height: 4,
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: colorScheme.onSurface.withOpacity(0.2),
+                      color: colorScheme.onSurface.withAlpha(51), // 0.2 * 255 = 51
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                
+
                 // Título
                 Text(
                   'Iniciar Sesión',
@@ -68,19 +64,19 @@ class _LoginModalState extends State<LoginModal> {
                     color: colorScheme.onSurface,
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Subtítulo
                 Text(
                   'Ingresa tus credenciales para acceder a tu cuenta',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
+                    color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Campo Email/Usuario
                 TextFormField(
                   controller: _emailController,
@@ -98,9 +94,9 @@ class _LoginModalState extends State<LoginModal> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Campo Contraseña
                 TextFormField(
                   controller: _passwordController,
@@ -110,7 +106,9 @@ class _LoginModalState extends State<LoginModal> {
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: colorScheme.secondary,
                       ),
                       onPressed: () {
@@ -132,7 +130,7 @@ class _LoginModalState extends State<LoginModal> {
                     return null;
                   },
                 ),
-                
+
                 // Olvidé mi contraseña
                 Align(
                   alignment: Alignment.centerRight,
@@ -149,9 +147,9 @@ class _LoginModalState extends State<LoginModal> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Botón Iniciar Sesión
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -161,22 +159,21 @@ class _LoginModalState extends State<LoginModal> {
                     if (_formKey.currentState!.validate()) {
                       // TODO: Implementar lógica real de inicio de sesión
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Iniciando sesión...'),
-                          backgroundColor: colorScheme.surface,
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
-                      
+
                       // Cerrar el modal después de iniciar sesión
                       Navigator.pop(context);
                     }
                   },
                   child: const Text('INICIAR SESIÓN'),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Opción para registrarse
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +181,7 @@ class _LoginModalState extends State<LoginModal> {
                     Text(
                       '¿No tienes una cuenta?',
                       style: TextStyle(
-                        color: colorScheme.onSurface.withOpacity(0.7),
+                        color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
                       ),
                     ),
                     TextButton(
@@ -192,7 +189,7 @@ class _LoginModalState extends State<LoginModal> {
                         // TODO: Implementar navegación a pantalla de registro
                         // Cerrar el modal de inicio de sesión
                         Navigator.pop(context);
-                        
+
                         // Aquí iría la lógica para mostrar el modal de registro
                       },
                       child: Text(

@@ -15,10 +15,10 @@ class PartnersCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // Colores con opacidad
-    final onBackgroundWithOpacity = colorScheme.onBackground.withOpacity(0.7);
-    
+    final onSurfaceWithOpacity = colorScheme.onSurface.withAlpha(179); // 0.7 * 255 = 179
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -33,7 +33,7 @@ class PartnersCarousel extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Carrusel horizontal de socios/marcas
         SizedBox(
           height: 80,
@@ -53,7 +53,7 @@ class PartnersCarousel extends StatelessWidget {
                   child: Icon(
                     Icons.business,
                     size: 32,
-                    color: onBackgroundWithOpacity,
+                    color: onSurfaceWithOpacity,
                   ),
                 ),
               );
