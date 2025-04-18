@@ -73,6 +73,10 @@ class LoginModal extends StatelessWidget {
                 onLogin: () {
                   // Cerrar el modal después de iniciar sesión
                   Navigator.pop(context);
+                  
+                  // Navegar a la ruta principal para que el AppRouter maneje la navegación
+                  // basada en el estado de autenticación
+                  Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                 },
               ),
             ),

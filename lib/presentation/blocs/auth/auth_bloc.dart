@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../data/models/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/repositories/user_repository.dart';
+import '../../../data/services/auth_service.dart'; // Importamos para acceder a PhoneAuthState
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final UserRepository _userRepository;
   StreamSubscription<User?>? _authStateSubscription;
+  StreamSubscription<PhoneAuthState>? _phoneAuthStateSubscription;
 
-  AuthBloc({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? AuthRepository(),
+  AuthBloc({
+    AuthRepository? authRepository,
+    UserRepository? userRepository,
+  })  : _authRepository = authRepository ?? AuthRepository(),
+        _userRepository = userRepository ?? UserRepository(),
         super(AuthState.initial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
@@ -20,6 +28,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<PasswordResetRequested>(_onPasswordResetRequested);
     on<SendEmailVerificationRequested>(_onSendEmailVerificationRequested);
     on<ReloadUserRequested>(_onReloadUserRequested);
+    
+    // Eventos para autenticación por teléfono
+    on<PhoneVerificationRequested>(_onPhoneVerificationRequested);
+    on<VerifySmsCodeRequested>(_onVerifySmsCodeRequested);
+    on<PasswordResetBySmsRequested>(_onPasswordResetBySmsRequested);
+    on<UpdatePasswordAfterPhoneVerificationRequested>(_onUpdatePasswordAfterPhoneVerification);
+    on<SmsCodeSentReceived>(_onSmsCodeSentReceived);
+    on<PhoneVerificationCompletedReceived>(_onPhoneVerificationCompletedReceived);
+    on<PhoneVerificationErrorReceived>(_onPhoneVerificationErrorReceived);
+    on<PhonePasswordUpdatedEvent>(_onPhonePasswordUpdated);
 
     // Suscribirse a los cambios de estado de autenticación
     _authStateSubscription = _authRepository.authStateChanges.listen(
@@ -31,16 +49,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       },
     );
+    
+    // Suscribirse a los cambios de estado de autenticación por teléfono
+    _phoneAuthStateSubscription = _authRepository.phoneAuthStateChanges.listen(
+      (PhoneAuthState phoneState) {
+        // Manejar cambios en el estado de autenticación por teléfono
+        if (phoneState == PhoneAuthState.passwordUpdated) {
+          // Usar add en lugar de emit en listeners
+          add(PhonePasswordUpdatedEvent());
+        }
+        // Los demás estados se manejan en los callbacks
+      },
+    );
   }
 
   Future<void> _onAuthCheckRequested(
       AuthCheckRequested event, Emitter<AuthState> emit,) async {
     final User? currentUser = _authRepository.currentUser;
     if (currentUser != null) {
+      // Verificar si es el primer inicio de sesión
+      bool isFirstLogin = false;
+      try {
+        isFirstLogin = await _userRepository.isFirstLogin();
+      } catch (e) {
+        // Si hay error al verificar, asumimos que no es el primer inicio de sesión
+      }
+      
+      // Intentar obtener datos adicionales del usuario desde Firestore
+      Map<String, dynamic>? userData;
+      try {
+        userData = await _userRepository.getCurrentUserData();
+      } catch (e) {
+        // Si hay error al obtener datos, continuamos con los datos básicos
+      }
+      
+      // Crear un modelo de usuario con los datos disponibles
+      final UserModel userModel = userData != null 
+          ? UserModel.fromFirestore(userData)
+          : UserModel.fromFirebaseUser(currentUser);
+      
       // Si el usuario se autenticó con email y no ha verificado su correo
       if (currentUser.providerData.any((provider) => provider.providerId == 'password') &&
           !currentUser.emailVerified) {
-        emit(AuthState.emailNotVerified(currentUser));
+        emit(AuthState.emailNotVerified(currentUser, userModel: userModel));
       } else {
         // Determinar el método de autenticación
         String? authMethod;
@@ -52,7 +103,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             authMethod = 'google';
           }
         }
-        emit(AuthState.authenticated(currentUser, authMethod: authMethod));
+        
+        // Verificar si es el primer inicio de sesión para mostrar la pantalla de bienvenida
+        if (isFirstLogin) {
+          emit(AuthState.firstLogin(currentUser, authMethod: authMethod, userModel: userModel));
+        } else {
+          emit(AuthState.authenticated(currentUser, authMethod: authMethod, userModel: userModel));
+        }
       }
     } else {
       emit(AuthState.unauthenticated());
@@ -68,9 +125,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
       );
       
+      // Actualizar la fecha de último inicio de sesión
+      try {
+        await _userRepository.saveInitialUserData(userCredential.user!);
+      } catch (e) {
+        // Si falla la actualización de datos, continuamos con el flujo principal
+      }
+      
       // Verificar si el email está verificado
       if (!userCredential.user!.emailVerified) {
-        emit(AuthState.emailNotVerified(userCredential.user!));
+        final userModel = UserModel.fromFirebaseUser(userCredential.user!);
+        emit(AuthState.emailNotVerified(userCredential.user!, userModel: userModel));
       }
       // No emitimos estado de autenticación aquí, ya que el listener de authStateChanges
       // actualizará el estado automáticamente
@@ -83,7 +148,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       GoogleSignInRequested event, Emitter<AuthState> emit,) async {
     emit(AuthState.loading());
     try {
-      await _authRepository.signInWithGoogle();
+      final userCredential = await _authRepository.signInWithGoogle();
+      
+      // Guardar o actualizar datos del usuario en Firestore
+      try {
+        await _userRepository.saveInitialUserData(userCredential.user!);
+      } catch (e) {
+        // Si falla la actualización de datos, continuamos con el flujo principal
+      }
+      
       // No emitimos estado aquí, ya que el listener de authStateChanges
       // actualizará el estado automáticamente
     } catch (e) {
@@ -100,8 +173,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
       );
       
+      // Guardar datos iniciales del usuario en Firestore
+      try {
+        await _userRepository.saveInitialUserData(userCredential.user!);
+      } catch (e) {
+        // Si falla la creación de datos, continuamos con el flujo principal
+      }
+      
+      // Crear modelo de usuario
+      final userModel = UserModel.fromFirebaseUser(userCredential.user!);
+      
       // Después del registro, el usuario necesita verificar su email
-      emit(AuthState.emailVerificationSent(userCredential.user!));
+      emit(AuthState.emailVerificationSent(userCredential.user!, userModel: userModel));
     } catch (e) {
       emit(AuthState.error(e.toString()));
     }
@@ -123,10 +206,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthState.loading());
     try {
       await _authRepository.sendPasswordResetEmail(event.email);
-      emit(state.copyWith(
-        status: AuthStatus.unauthenticated,
-        errorMessage: 'Se ha enviado un correo para restablecer tu contraseña',
-      ));
+      emit(AuthState.passwordResetSent(event.email));
     } catch (e) {
       emit(AuthState.error(e.toString()));
     }
@@ -158,9 +238,143 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  Future<void> _onPhoneVerificationRequested(
+      PhoneVerificationRequested event, Emitter<AuthState> emit) async {
+    emit(AuthState.loading());
+    
+    try {
+      await _authRepository.verifyPhoneNumber(
+        phoneNumber: event.phoneNumber,
+        isForRegistration: event.isForRegistration,
+        onCodeSent: (String verificationId) {
+          add(SmsCodeSentReceived(verificationId: verificationId));
+        },
+        onVerificationCompleted: (PhoneAuthCredential credential) {
+          add(PhoneVerificationCompletedReceived(credential: credential));
+        },
+        onError: (String errorMessage) {
+          add(PhoneVerificationErrorReceived(errorMessage: errorMessage));
+        },
+      );
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  Future<void> _onVerifySmsCodeRequested(
+      VerifySmsCodeRequested event, Emitter<AuthState> emit) async {
+    emit(AuthState.loading());
+    
+    try {
+      final userCredential = await _authRepository.verifyPhoneSmsCode(
+        verificationId: event.verificationId,
+        smsCode: event.smsCode,
+        email: event.email,
+        password: event.password,
+      );
+      
+      if (userCredential.user != null) {
+        final isFirstLogin = await _userRepository.isFirstLogin();
+        emit(AuthState.phoneVerified(
+          userCredential.user!,
+          isFirstLogin: isFirstLogin,
+        ));
+      } else {
+        emit(AuthState.error('Error al verificar el código SMS'));
+      }
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  Future<void> _onPasswordResetBySmsRequested(
+      PasswordResetBySmsRequested event, Emitter<AuthState> emit) async {
+    emit(AuthState.loading());
+    
+    try {
+      await _authRepository.sendPasswordResetBySms(
+        phoneNumber: event.phoneNumber,
+        onCodeSent: (String verificationId) {
+          emit(AuthState.phonePasswordResetSent(verificationId, event.phoneNumber));
+        },
+        onVerified: () {
+          emit(AuthState.phonePasswordUpdated());
+        },
+        onError: (String errorMessage) {
+          emit(AuthState.error(errorMessage));
+        },
+      );
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  Future<void> _onUpdatePasswordAfterPhoneVerification(
+      UpdatePasswordAfterPhoneVerificationRequested event, Emitter<AuthState> emit) async {
+    emit(AuthState.loading());
+    
+    try {
+      await _authRepository.updatePasswordAfterPhoneVerification(
+        verificationId: event.verificationId,
+        smsCode: event.smsCode,
+        newPassword: event.newPassword,
+      );
+      
+      emit(AuthState.phonePasswordUpdated());
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  void _onSmsCodeSentReceived(
+      SmsCodeSentReceived event, Emitter<AuthState> emit) {
+    final currentState = state;
+    final phoneNumber = currentState.phoneNumber;
+    
+    if (phoneNumber != null) {
+      emit(AuthState.phoneVerificationSent(event.verificationId, phoneNumber));
+    } else {
+      // Si no tenemos el número de teléfono en el estado, usamos uno genérico
+      emit(AuthState.phoneVerificationSent(event.verificationId, 'tu teléfono'));
+    }
+  }
+
+  Future<void> _onPhoneVerificationCompletedReceived(
+      PhoneVerificationCompletedReceived event, Emitter<AuthState> emit) async {
+    emit(AuthState.loading());
+    
+    try {
+      final userCredential = await _authRepository.signInWithCredential(event.credential);
+      
+      if (userCredential.user != null) {
+        final isFirstLogin = await _userRepository.isFirstLogin();
+        emit(AuthState.phoneVerified(
+          userCredential.user!,
+          isFirstLogin: isFirstLogin,
+        ));
+      } else {
+        emit(AuthState.error('Error al verificar automáticamente'));
+      }
+    } catch (e) {
+      emit(AuthState.error(e.toString()));
+    }
+  }
+
+  void _onPhoneVerificationErrorReceived(
+      PhoneVerificationErrorReceived event, Emitter<AuthState> emit) {
+    emit(AuthState.phoneVerificationError(event.errorMessage));
+  }
+
+  Future<void> _onPhonePasswordUpdated(
+      PhonePasswordUpdatedEvent event, Emitter<AuthState> emit) async {
+    emit(AuthState.phonePasswordUpdated());
+  }
+
   @override
   Future<void> close() {
     _authStateSubscription?.cancel();
+    _phoneAuthStateSubscription?.cancel();
+    _authRepository.dispose();
     return super.close();
   }
 }

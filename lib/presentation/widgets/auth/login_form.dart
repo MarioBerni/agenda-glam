@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth/auth.dart';
+import '../common/animated_form_container.dart';
+import '../common/custom_snackbar.dart';
 import 'google_sign_in_button.dart';
 
 /// Widget que contiene el formulario de inicio de sesión con campos de texto,
@@ -36,13 +38,42 @@ class _LoginFormState extends State<LoginForm> {
         _isLoading = true;
       });
 
+      final identifier = _emailController.text.trim();
+      
+      // Determinar si es un email o un teléfono
+      final bool isEmail = identifier.contains('@');
+      
       // Iniciar sesión con Firebase a través del BLoC
-      context.read<AuthBloc>().add(
-            SignInRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+      if (isEmail) {
+        // Si es un email, usar el método tradicional
+        context.read<AuthBloc>().add(
+              SignInRequested(
+                email: identifier,
+                password: _passwordController.text,
+              ),
+            );
+      } else {
+        // Si es un teléfono, verificar que tenga el formato correcto
+        String phoneNumber = identifier;
+        
+        // Asegurarse de que tenga el formato internacional
+        if (!phoneNumber.startsWith('+')) {
+          // Si no tiene el prefijo internacional, añadir el de Uruguay
+          if (phoneNumber.startsWith('0')) {
+            // Quitar el 0 inicial si existe
+            phoneNumber = phoneNumber.substring(1);
+          }
+          // Añadir el código de país de Uruguay
+          phoneNumber = '+598$phoneNumber';
+        }
+        
+        // Solicitar verificación por teléfono
+        context.read<AuthBloc>().add(
+              PhoneVerificationRequested(
+                phoneNumber: phoneNumber,
+              ),
+            );
+      }
     }
   }
 
@@ -61,80 +92,59 @@ class _LoginFormState extends State<LoginForm> {
         });
 
         if (state.status == AuthStatus.error) {
-          // Mostrar mensaje de error con más detalles
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage ?? 'Error de autenticación'),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors.white,
-                onPressed: () {},
-              ),
+          // Mostrar mensaje de error con más detalles usando CustomSnackBar
+          CustomSnackBar.showError(
+            context: context,
+            message: state.errorMessage ?? 'Error de autenticación',
+            action: SnackBarAction(
+              label: 'OK',
+              textColor: Colors.white,
+              onPressed: () {},
             ),
           );
         } else if (state.status == AuthStatus.authenticated) {
           // Mostrar mensaje de éxito antes de cerrar el modal
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text('¡Inicio de sesión exitoso!'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 2),
-            ),
+          CustomSnackBar.showSuccess(
+            context: context,
+            message: '¡Inicio de sesión exitoso!',
+            duration: const Duration(seconds: 2),
+            onVisible: () {
+              // Ejecutar callback si existe después de un breve retraso
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (widget.onLogin != null) {
+                  widget.onLogin!();
+                }
+              });
+            },
           );
-          
-          // Ejecutar callback si existe después de un breve retraso
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (widget.onLogin != null) {
-              widget.onLogin!();
-            }
-          });
         } else if (state.status == AuthStatus.emailNotVerified) {
           // Mostrar mensaje de que el email no está verificado
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.warning, color: Colors.white),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text('Tu correo electrónico no ha sido verificado. Por favor, verifica tu bandeja de entrada.'),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.orange,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: 'Reenviar',
-                textColor: Colors.white,
-                onPressed: () {
-                  context.read<AuthBloc>().add(SendEmailVerificationRequested());
-                },
-              ),
+          CustomSnackBar.showWarning(
+            context: context,
+            message: 'Tu correo electrónico no ha sido verificado. Por favor, verifica tu bandeja de entrada.',
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Reenviar',
+              textColor: Colors.white,
+              onPressed: () {
+                context.read<AuthBloc>().add(SendEmailVerificationRequested());
+              },
             ),
           );
         }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: secondaryWithLowOpacity,
-              blurRadius: 12,
-            ),
-          ],
-        ),
-        child: Card(
+      child: AnimatedFormContainer(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: secondaryWithLowOpacity,
+                blurRadius: 12,
+              ),
+            ],
+          ),
+          child: Card(
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -146,19 +156,20 @@ class _LoginFormState extends State<LoginForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Campo de Email/Usuario
+                  // Campo de Email/Teléfono
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      labelText: 'Email o Usuario',
+                      labelText: 'Email o Teléfono',
                       prefixIcon: Icon(Icons.person_outline),
-                      hintText: 'Ingresa tu correo electrónico',
+                      hintText: 'Ingresa tu correo o número de teléfono',
+                      helperText: 'Puedes usar tu email o número con código de país (+598)',
                     ),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu email o usuario';
+                        return 'Por favor ingresa tu email o teléfono';
                       }
                       return null;
                     },
@@ -225,26 +236,15 @@ class _LoginFormState extends State<LoginForm> {
                         onPressed: _isLoading 
                             ? null 
                             : () {
+                                // Obtener el email si está disponible (opcional)
                                 final email = _emailController.text.trim();
-                                if (email.isNotEmpty) {
-                                  context.read<AuthBloc>().add(
-                                        PasswordResetRequested(email: email),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Icon(Icons.info, color: Colors.white),
-                                          SizedBox(width: 8),
-                                          Text('Por favor ingresa tu email primero'),
-                                        ],
-                                      ),
-                                      backgroundColor: Colors.blue,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
+                                
+                                // Navegar directamente a la página de recuperación
+                                Navigator.of(context).pushNamed(
+                                  '/password-reset',
+                                  // Pasar el email como argumento solo si está disponible
+                                  arguments: email.isNotEmpty ? email : null,
+                                );
                               },
                         child: Text(
                           'Olvidé mi contraseña',
@@ -307,6 +307,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
       ),
+    ),
     );
   }
 }

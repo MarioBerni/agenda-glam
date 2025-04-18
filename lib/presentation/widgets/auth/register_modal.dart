@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 import 'register_form.dart';
+import 'phone_register_form.dart';
 import 'login_modal.dart';
 
 /// Modal deslizante para el registro de usuarios
-class RegisterModal extends StatelessWidget {
+class RegisterModal extends StatefulWidget {
   const RegisterModal({super.key});
 
+  @override
+  State<RegisterModal> createState() => _RegisterModalState();
+}
+
+class _RegisterModalState extends State<RegisterModal> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -68,16 +88,58 @@ class RegisterModal extends StatelessWidget {
           
           const SizedBox(height: 16),
           
+          // Pestañas para seleccionar método de registro
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurface.withAlpha(153), // 0.6 * 255 = 153
+              indicatorColor: colorScheme.primary,
+              tabs: const [
+                Tab(text: 'Email', icon: Icon(Icons.email_outlined)),
+                Tab(text: 'Teléfono', icon: Icon(Icons.phone_android_outlined)),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
           // Formulario de registro
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: RegisterForm(
-                onRegister: () {
-                  // Cerrar el modal después de un registro exitoso
-                  Navigator.of(context).pop();
-                },
-              ),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Pestaña de registro por email
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: RegisterForm(
+                    onRegister: () {
+                      // Cerrar el modal después de un registro exitoso
+                      Navigator.of(context).pop();
+                      
+                      // Navegar a la ruta principal para que el AppRouter maneje la navegación
+                      // basada en el estado de autenticación
+                      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                    },
+                  ),
+                ),
+                
+                // Pestaña de registro por teléfono
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: PhoneRegisterForm(
+                    onRegister: () {
+                      // Cerrar el modal después de un registro exitoso
+                      Navigator.of(context).pop();
+                      
+                      // Navegar a la ruta principal para que el AppRouter maneje la navegación
+                      // basada en el estado de autenticación
+                      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           

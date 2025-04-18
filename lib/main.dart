@@ -3,9 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
 import 'core/theme/theme.dart';
-// import 'presentation/pages/home_page.dart';
-// import 'presentation/pages/auth/login_page.dart';
+import 'data/repositories/user_repository.dart';
+import 'presentation/pages/home_page.dart';
+import 'presentation/pages/password_reset_page.dart';
+import 'presentation/pages/welcome_after_login_page.dart';
 import 'presentation/pages/welcome_page.dart';
+import 'presentation/widgets/app_router.dart';
 import 'presentation/blocs/auth/auth.dart';
 
 // Función para inicializar Firebase
@@ -56,13 +59,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc()..add(AuthCheckRequested()),
+    // Crear instancias de repositorios
+    final userRepository = UserRepository();
+    
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(userRepository: userRepository)..add(AuthCheckRequested()),
+        ),
+      ],
       child: MaterialApp(
         title: 'Agenda Glam',
         theme: appTheme,
         debugShowCheckedModeBanner: false, // Eliminar banner de debug
-        home: const WelcomePage(),
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          
+          switch (settings.name) {
+            case '/password-reset':
+              return MaterialPageRoute(
+                builder: (context) => const PasswordResetPage(),
+                settings: settings,
+              );
+            default:
+              return null; // Permitir que el sistema de rutas maneje las rutas no especificadas
+          }
+        },
+        routes: {
+          '/': (context) => const AppRouter(),
+          '/welcome': (context) => const WelcomePage(),
+          '/home': (context) => const HomePage(),
+          // '/password-reset': (context) => const PasswordResetPage(), // Comentado porque ahora lo manejamos en onGenerateRoute
+          '/welcome-after-login': (context) => const WelcomeAfterLoginPage(),
+        },
       ),
     );
   }

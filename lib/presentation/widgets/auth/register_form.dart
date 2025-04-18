@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth/auth.dart';
+import '../common/animated_form_container.dart';
+import '../common/custom_snackbar.dart';
 import 'google_sign_in_button.dart';
+import 'password_strength_indicator.dart';
 
 /// Widget que contiene el formulario de registro con campos de texto
 /// y botón de registro.
@@ -24,32 +27,35 @@ class _RegisterFormState extends State<RegisterForm> {
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   bool _acceptTerms = false;
+  String _currentPassword = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_updatePasswordStrength);
+  }
 
   @override
   void dispose() {
+    _passwordController.removeListener(_updatePasswordStrength);
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
+  
+  void _updatePasswordStrength() {
+    setState(() {
+      _currentPassword = _passwordController.text;
+    });
+  }
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
       if (!_acceptTerms) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.warning, color: Colors.white),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text('Debes aceptar los términos y condiciones para registrarte.'),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomSnackBar.showWarning(
+          context: context,
+          message: 'Debes aceptar los términos y condiciones para registrarte.',
         );
         return;
       }
@@ -84,64 +90,45 @@ class _RegisterFormState extends State<RegisterForm> {
 
         if (state.status == AuthStatus.error) {
           // Mostrar mensaje de error con más detalles
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.error_outline, color: Colors.white),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text('Error de registro'),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors.white,
-                onPressed: () {},
-              ),
+          CustomSnackBar.showError(
+            context: context,
+            message: state.errorMessage ?? 'Error de registro',
+            action: SnackBarAction(
+              label: 'OK',
+              textColor: Colors.white,
+              onPressed: () {},
             ),
           );
         } else if (state.status == AuthStatus.emailVerificationSent) {
           // Mostrar mensaje de verificación de correo enviada
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.mark_email_read, color: Colors.white),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text('Te hemos enviado un correo de verificación. Por favor, revisa tu bandeja de entrada y confirma tu correo.'),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 8),
-            ),
+          CustomSnackBar.showSuccess(
+            context: context,
+            message: 'Te hemos enviado un correo de verificación. Por favor, revisa tu bandeja de entrada y confirma tu correo.',
+            duration: const Duration(seconds: 8),
+            onVisible: () {
+              // Ejecutar callback si existe después de un breve retraso
+              Future.delayed(const Duration(seconds: 2), () {
+                if (widget.onRegister != null) {
+                  widget.onRegister!();
+                }
+              });
+            },
           );
-          
-          // Ejecutar callback si existe después de un breve retraso
-          Future.delayed(const Duration(seconds: 2), () {
-            if (widget.onRegister != null) {
-              widget.onRegister!();
-            }
-          });
         }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: secondaryWithLowOpacity,
-              blurRadius: 12,
-            ),
-          ],
-        ),
-        child: Card(
+      child: AnimatedFormContainer(
+        delay: const Duration(milliseconds: 200),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: secondaryWithLowOpacity,
+                blurRadius: 12,
+              ),
+            ],
+          ),
+          child: Card(
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -211,6 +198,12 @@ class _RegisterFormState extends State<RegisterForm> {
                       return null;
                     },
                     enabled: !_isLoading,
+                  ),
+                  
+                  // Indicador de fortaleza de contraseña
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: PasswordStrengthIndicator(password: _currentPassword),
                   ),
                   
                   const SizedBox(height: 16.0),
@@ -347,6 +340,7 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
         ),
       ),
+    ),
     );
   }
 }

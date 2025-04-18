@@ -2,9 +2,11 @@ Directory structure:
 └── marioberni-agenda-glam/
     ├── README.md
     ├── analysis_options.yaml
+    ├── firebase.json
     ├── pubspec.lock
     ├── pubspec.yaml
     ├── .metadata
+    ├── .windsurfrules
     ├── android/
     │   ├── build.gradle.kts
     │   ├── gradle.properties
@@ -12,6 +14,7 @@ Directory structure:
     │   ├── .gitignore
     │   ├── app/
     │   │   ├── build.gradle.kts
+    │   │   ├── google-services.json
     │   │   └── src/
     │   │       ├── debug/
     │   │       │   └── AndroidManifest.xml
@@ -44,6 +47,7 @@ Directory structure:
     ├── assets/
     │   └── images/
     ├── documentacion/
+    │   ├── ESTRUCTURA.md
     │   ├── OLEADA-IMPLEMENTACIONES-1.md
     │   ├── OLEADA-IMPLEMENTACIONES-2.MD
     │   └── PROYECTO.md
@@ -84,11 +88,26 @@ Directory structure:
     │   └── RunnerTests/
     │       └── RunnerTests.swift
     ├── lib/
+    │   ├── firebase_options.dart
     │   ├── main.dart
     │   ├── core/
     │   │   └── theme/
     │   │       └── theme.dart
+    │   ├── data/
+    │   │   ├── repositories/
+    │   │   │   └── auth_repository.dart
+    │   │   └── services/
+    │   │       └── auth_service.dart
+    │   ├── domain/
+    │   │   └── repositories/
+    │   │       └── auth_repository_interface.dart
     │   └── presentation/
+    │       ├── blocs/
+    │       │   └── auth/
+    │       │       ├── auth.dart
+    │       │       ├── auth_bloc.dart
+    │       │       ├── auth_event.dart
+    │       │       └── auth_state.dart
     │       ├── pages/
     │       │   ├── home_page.dart
     │       │   ├── welcome_page.dart
@@ -97,10 +116,13 @@ Directory structure:
     │       └── widgets/
     │           ├── auth/
     │           │   ├── auth_widgets.dart
+    │           │   ├── google_sign_in_button.dart
     │           │   ├── login_footer.dart
     │           │   ├── login_form.dart
     │           │   ├── login_header.dart
-    │           │   └── login_modal.dart
+    │           │   ├── login_modal.dart
+    │           │   ├── register_form.dart
+    │           │   └── register_modal.dart
     │           └── welcome/
     │               ├── action_buttons.dart
     │               ├── benefits_grid.dart

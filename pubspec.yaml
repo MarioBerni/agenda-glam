@@ -48,6 +48,11 @@ dependencies:
   # Gestión de estado
   flutter_bloc: ^8.1.4
   equatable: ^2.0.5
+  shared_preferences: ^2.5.3
+  
+  # Utilidades
+  logging: ^1.2.0
+  intl_phone_field: ^3.2.0
 
 dev_dependencies:
   flutter_test:
