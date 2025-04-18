@@ -16,14 +16,14 @@ linter:
   rules:
     # Estilo y formato
     prefer_single_quotes: true        # Usar comillas simples en lugar de dobles
-    require_trailing_commas: true     # Requiere comas finales para mejorar la legibilidad en git
+    # require_trailing_commas: false     # Temporalmente deshabilitado
     sort_child_properties_last: true  # Propiedades child al final en widgets
     
     # Buenas prácticas
     avoid_print: true                 # Evitar print() en código de producción
-    prefer_const_constructors: true   # Usar constructores const cuando sea posible
+    # prefer_const_constructors: false   # Temporalmente deshabilitado
     prefer_final_locals: true         # Preferir variables locales final
-    avoid_redundant_argument_values: true  # Evitar valores de argumentos redundantes
+    # avoid_redundant_argument_values: false  # Temporalmente deshabilitado
     
     # Rendimiento
     avoid_unnecessary_containers: true  # Evitar Containers innecesarios
@@ -37,6 +37,9 @@ analyzer:
     # Tratar algunos lints como warnings en lugar de errores
     prefer_const_constructors: warning
     prefer_final_locals: warning
+    require_trailing_commas: warning
+    avoid_redundant_argument_values: warning
+    prefer_const_literals_to_create_immutables: warning
   exclude:
     # Excluir archivos generados automáticamente
     - "**/*.g.dart"

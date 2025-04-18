@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
+import 'login_form.dart';
+import 'register_modal.dart';
 
 /// Widget que muestra un formulario de inicio de sesión en un modal
-class LoginModal extends StatefulWidget {
+class LoginModal extends StatelessWidget {
   const LoginModal({super.key});
-
-  @override
-  State<LoginModal> createState() => _LoginModalState();
-}
-
-class _LoginModalState extends State<LoginModal> {
-  final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true;
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,176 +20,102 @@ class _LoginModalState extends State<LoginModal> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Barra de arrastre
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      color: colorScheme.onSurface.withAlpha(51), // 0.2 * 255 = 51
-                      borderRadius: BorderRadius.circular(2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Barra de arrastre
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurface.withAlpha(51), // 0.2 * 255 = 51
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Título
+                  Text(
+                    'Iniciar Sesión',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                ),
 
-                // Título
-                Text(
-                  'Iniciar Sesión',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
+                  const SizedBox(height: 8),
 
-                const SizedBox(height: 8),
-
-                // Subtítulo
-                Text(
-                  'Ingresa tus credenciales para acceder a tu cuenta',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Campo Email/Usuario
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email o Usuario',
-                    prefixIcon: Icon(Icons.person_outline),
-                    hintText: 'ejemplo@correo.com',
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor, ingresa tu email o usuario';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Campo Contraseña
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Contraseña',
-                    hintText: '********',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: colorScheme.secondary,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                  // Subtítulo
+                  Text(
+                    'Ingresa tus credenciales para acceder a tu cuenta',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
                     ),
                   ),
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, ingresa tu contraseña';
-                    }
-                    if (value.length < 6) {
-                      return 'La contraseña debe tener al menos 6 caracteres';
-                    }
-                    return null;
-                  },
-                ),
 
-                // Olvidé mi contraseña
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+
+            // Formulario de inicio de sesión
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: LoginForm(
+                onLogin: () {
+                  // Cerrar el modal después de iniciar sesión
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Opción para registrarse
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '¿No tienes una cuenta?',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
+                    ),
+                  ),
+                  TextButton(
                     onPressed: () {
-                      // TODO: Implementar recuperación de contraseña
+                      // Cerrar el modal de inicio de sesión
+                      Navigator.pop(context);
+
+                      // Mostrar el modal de registro
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const RegisterModal(),
+                      );
                     },
                     child: Text(
-                      'Olvidé mi contraseña',
+                      'Regístrate',
                       style: TextStyle(
                         color: colorScheme.secondary,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Botón Iniciar Sesión
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 56),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // TODO: Implementar lógica real de inicio de sesión
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Iniciando sesión...'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-
-                      // Cerrar el modal después de iniciar sesión
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('INICIAR SESIÓN'),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Opción para registrarse
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '¿No tienes una cuenta?',
-                      style: TextStyle(
-                        color: colorScheme.onSurface.withAlpha(179), // 0.7 * 255 = 179
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Implementar navegación a pantalla de registro
-                        // Cerrar el modal de inicio de sesión
-                        Navigator.pop(context);
-
-                        // Aquí iría la lógica para mostrar el modal de registro
-                      },
-                      child: Text(
-                        'Regístrate',
-                        style: TextStyle(
-                          color: colorScheme.secondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

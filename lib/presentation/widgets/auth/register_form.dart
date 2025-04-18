@@ -3,42 +3,64 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth/auth.dart';
 import 'google_sign_in_button.dart';
 
-/// Widget que contiene el formulario de inicio de sesión con campos de texto,
-/// opción de recordar contraseña y botón de inicio de sesión.
-class LoginForm extends StatefulWidget {
-  /// Función que se ejecuta cuando se intenta iniciar sesión
-  final VoidCallback? onLogin;
+/// Widget que contiene el formulario de registro con campos de texto
+/// y botón de registro.
+class RegisterForm extends StatefulWidget {
+  /// Función que se ejecuta cuando se completa el registro
+  final VoidCallback? onRegister;
 
-  const LoginForm({super.key, this.onLogin});
+  const RegisterForm({super.key, this.onRegister});
 
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<RegisterForm> createState() => _RegisterFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe = false;
+  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
+  bool _acceptTerms = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleRegister() {
     if (_formKey.currentState!.validate()) {
+      if (!_acceptTerms) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.warning, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text('Debes aceptar los términos y condiciones para registrarte.'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
-      // Iniciar sesión con Firebase a través del BLoC
+      // Registrar con Firebase a través del BLoC
       context.read<AuthBloc>().add(
-            SignInRequested(
+            SignUpRequested(
               email: _emailController.text.trim(),
               password: _passwordController.text,
             ),
@@ -64,7 +86,15 @@ class _LoginFormState extends State<LoginForm> {
           // Mostrar mensaje de error con más detalles
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage ?? 'Error de autenticación'),
+              content: const Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Error de registro'),
+                  ),
+                ],
+              ),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               action: SnackBarAction(
@@ -74,54 +104,31 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
           );
-        } else if (state.status == AuthStatus.authenticated) {
-          // Mostrar mensaje de éxito antes de cerrar el modal
+        } else if (state.status == AuthStatus.emailVerificationSent) {
+          // Mostrar mensaje de verificación de correo enviada
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.white),
+                  Icon(Icons.mark_email_read, color: Colors.white),
                   SizedBox(width: 8),
-                  Text('¡Inicio de sesión exitoso!'),
+                  Expanded(
+                    child: Text('Te hemos enviado un correo de verificación. Por favor, revisa tu bandeja de entrada y confirma tu correo.'),
+                  ),
                 ],
               ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 2),
+              duration: Duration(seconds: 8),
             ),
           );
           
           // Ejecutar callback si existe después de un breve retraso
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (widget.onLogin != null) {
-              widget.onLogin!();
+          Future.delayed(const Duration(seconds: 2), () {
+            if (widget.onRegister != null) {
+              widget.onRegister!();
             }
           });
-        } else if (state.status == AuthStatus.emailNotVerified) {
-          // Mostrar mensaje de que el email no está verificado
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.warning, color: Colors.white),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text('Tu correo electrónico no ha sido verificado. Por favor, verifica tu bandeja de entrada.'),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.orange,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: 'Reenviar',
-                textColor: Colors.white,
-                onPressed: () {
-                  context.read<AuthBloc>().add(SendEmailVerificationRequested());
-                },
-              ),
-            ),
-          );
         }
       },
       child: Container(
@@ -146,19 +153,25 @@ class _LoginFormState extends State<LoginForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Campo de Email/Usuario
+                  // Campo de Email
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      labelText: 'Email o Usuario',
-                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
                       hintText: 'Ingresa tu correo electrónico',
                     ),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu email o usuario';
+                        return 'Por favor ingresa tu email';
+                      }
+                      final emailRegExp = RegExp(
+                        r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
+                      );
+                      if (!emailRegExp.hasMatch(value)) {
+                        return 'Por favor ingresa un email válido';
                       }
                       return null;
                     },
@@ -173,7 +186,8 @@ class _LoginFormState extends State<LoginForm> {
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
                       prefixIcon: const Icon(Icons.lock_outline),
-                      hintText: 'Ingresa tu contraseña',
+                      hintText: 'Crea una contraseña segura',
+                      helperText: 'Mínimo 6 caracteres',
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -186,72 +200,74 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     ),
                     obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.done,
+                    textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu contraseña';
+                        return 'Por favor ingresa una contraseña';
                       }
                       if (value.length < 6) {
                         return 'La contraseña debe tener al menos 6 caracteres';
                       }
                       return null;
                     },
-                    onFieldSubmitted: (_) => _isLoading ? null : _handleLogin(),
                     enabled: !_isLoading,
                   ),
                   
                   const SizedBox(height: 16.0),
                   
-                  // Opción Recordarme
+                  // Campo de Confirmar Contraseña
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar Contraseña',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      hintText: 'Repite tu contraseña',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                    ),
+                    obscureText: _obscureConfirmPassword,
+                    textInputAction: TextInputAction.done,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor confirma tu contraseña';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Las contraseñas no coinciden';
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
+                    enabled: !_isLoading,
+                  ),
+                  
+                  const SizedBox(height: 16.0),
+                  
+                  // Aceptar términos y condiciones
                   Row(
                     children: [
                       Checkbox(
-                        value: _rememberMe,
+                        value: _acceptTerms,
                         onChanged: _isLoading 
                             ? null 
                             : (value) {
                                 setState(() {
-                                  _rememberMe = value ?? false;
+                                  _acceptTerms = value ?? false;
                                 });
                               },
                         activeColor: colorScheme.secondary,
                       ),
-                      const Text('Recordarme'),
-                      
-                      const Spacer(),
-                      
-                      // Olvidé mi contraseña
-                      TextButton(
-                        onPressed: _isLoading 
-                            ? null 
-                            : () {
-                                final email = _emailController.text.trim();
-                                if (email.isNotEmpty) {
-                                  context.read<AuthBloc>().add(
-                                        PasswordResetRequested(email: email),
-                                      );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Icon(Icons.info, color: Colors.white),
-                                          SizedBox(width: 8),
-                                          Text('Por favor ingresa tu email primero'),
-                                        ],
-                                      ),
-                                      backgroundColor: Colors.blue,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
+                      Expanded(
                         child: Text(
-                          'Olvidé mi contraseña',
-                          style: TextStyle(
-                            color: _isLoading ? colorScheme.secondary.withAlpha(128) : colorScheme.secondary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          'Acepto los términos y condiciones y la política de privacidad',
+                          style: theme.textTheme.bodySmall,
                         ),
                       ),
                     ],
@@ -259,12 +275,12 @@ class _LoginFormState extends State<LoginForm> {
                   
                   const SizedBox(height: 24.0),
                   
-                  // Botón Iniciar Sesión
+                  // Botón Registrarse
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 56),
                     ),
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: _isLoading ? null : _handleRegister,
                     child: _isLoading
                         ? const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -275,10 +291,10 @@ class _LoginFormState extends State<LoginForm> {
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               ),
                               SizedBox(width: 12),
-                              Text('INICIANDO SESIÓN...'),
+                              Text('PROCESANDO...'),
                             ],
                           )
-                        : const Text('INICIAR SESIÓN'),
+                        : const Text('REGISTRARSE'),
                   ),
                   
                   const SizedBox(height: 16.0),
@@ -300,7 +316,31 @@ class _LoginFormState extends State<LoginForm> {
                   const SizedBox(height: 16.0),
                   
                   // Botón de Google
-                  GoogleSignInButton(onSignIn: widget.onLogin),
+                  GoogleSignInButton(onSignIn: widget.onRegister),
+                  
+                  const SizedBox(height: 16.0),
+                  
+                  // Nota sobre verificación de correo
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withAlpha(50)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.blue),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Después de registrarte, te enviaremos un correo de verificación. Por favor, revisa tu bandeja de entrada y confirma tu correo.',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

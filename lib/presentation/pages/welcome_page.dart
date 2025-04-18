@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 // Importar widgets modulares
 import '../widgets/welcome/welcome_widgets.dart';
-// Importar el modal de inicio de sesión
+// Importar modales de autenticación
 import '../widgets/auth/login_modal.dart';
+import '../widgets/auth/register_modal.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -92,9 +93,13 @@ class WelcomePage extends StatelessWidget {
                 // Botones de acción
                 ActionButtons(
                   onRegister: () {
-                    // Por ahora usamos el mismo modal de inicio de sesión
-                    // TODO: Implementar un modal específico para registro
-                    showLoginModal(context);
+                    // Mostrar el modal de registro
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const RegisterModal(),
+                    );
                   },
                   onLogin: () {
                     // Mostrar el modal de inicio de sesión

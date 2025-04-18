@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "171343975181",
+    "project_id": "agenda-glam-a20d8",
+    "storage_bucket": "agenda-glam-a20d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171343975181:android:3dd2e7910bc12efdf35644",
+        "android_client_info": {
+          "package_name": "com.example.agenda_glam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "171343975181-8vcdl6jb26toeeb9btco2pedopr0is10.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.agenda_glam",
+            "certificate_hash": "7c51a798cb16323e85bc6f3cb8464369c2b4a96b"
+          }
+        },
+        {
+          "client_id": "171343975181-ho2td6c97skfgjqoiqq64004krh903t9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_WSQDnP2MD9Vd1XHqbO2jRN18wwe5BHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "171343975181-ho2td6c97skfgjqoiqq64004krh903t9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "171343975181-cdqfef4hmqbntsl9798ffr8h5p9erp3a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.agendaGlam"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
