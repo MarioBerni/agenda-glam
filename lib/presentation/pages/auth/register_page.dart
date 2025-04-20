@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Importar los widgets y servicios necesarios
+import '../../../core/enums/auth_method.dart';
 import '../../blocs/auth/auth.dart';
 import '../../widgets/common/animated_background.dart';
 import 'login_page.dart';
@@ -28,6 +29,9 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
+  
+  // Método de autenticación seleccionado
+  AuthMethod _authMethod = AuthMethod.email;
   
   // Controlador para las animaciones
   late AnimationController _animationController;
@@ -102,12 +106,45 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         _isLoading = true;
       });
       
-      // Registrar con Firebase a través del BLoC
-      _registerController.registerWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      // Iniciar temporizador para evitar que se quede cargando indefinidamente
+      _startRegistrationTimeout();
+      
+      if (_authMethod == AuthMethod.email) {
+        // Registro por email
+        _registerController.registerWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+      } else {
+        // Registro por teléfono - ahora el número ya incluye el código de país
+        // gracias al widget IntlPhoneField
+        _registerController.registerWithPhoneNumber(
+          phoneNumber: _phoneController.text,
+          password: _passwordController.text,
+        );
+      }
     }
+  }
+  
+  /// Iniciar temporizador para evitar que se quede cargando indefinidamente
+  void _startRegistrationTimeout() {
+    Future.delayed(const Duration(seconds: 15), () {
+      // Verificar si el widget sigue montado antes de actualizar el estado
+      if (!mounted) return;
+      
+      if (_isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Usar el contexto actual, ya que verificamos que el widget sigue montado
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('La operación ha tardado demasiado. Por favor, inténtalo de nuevo.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
   }
   
   /// Manejar la navegación a la página de inicio de sesión
@@ -139,16 +176,63 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         child: SafeArea(
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
-              if (state.status == AuthStatus.authenticated) {
+              // Siempre desactivar el estado de carga cuando cambia el estado (excepto loading)
+              if (state.status != AuthStatus.loading) {
                 setState(() {
                   _isLoading = false;
                 });
+              }
+              
+              // Manejar los diferentes estados
+              if (state.status == AuthStatus.authenticated) {
                 // Navegar a la página principal
                 Navigator.pushReplacementNamed(context, '/home');
-              } else if (state.status == AuthStatus.error) {
-                setState(() {
-                  _isLoading = false;
+              } else if (state.status == AuthStatus.emailNotVerified) {
+                // Mostrar mensaje de verificación de correo
+                _registerController.showResultMessage(
+                  isSuccess: true,
+                  message: 'Registro exitoso. Por favor, verifica tu correo electrónico.',
+                );
+                
+                // Programar la navegación a la página de login después de un delay
+                // Usamos una bandera para controlar si debemos navegar
+                bool shouldNavigate = true;
+                
+                // Definir la acción de navegación
+                void navigateToLogin() {
+                  // Navegar a la página de login con indicador de que viene de registro
+                  Navigator.of(context).pushReplacementNamed(
+                    '/login',
+                    arguments: true, // Indica que viene de registro
+                  );
+                }
+                
+                // Ejecutar la navegación inmediatamente, sin delay
+                // Esto evita el problema de uso de BuildContext a través de gaps asíncronos
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  // Verificar si todavía debemos navegar
+                  if (shouldNavigate) {
+                    // Esperar 2 segundos antes de navegar
+                    Future.delayed(const Duration(seconds: 2), () {
+                      // Cancelar la navegación si el widget ya no está montado
+                      if (mounted && shouldNavigate) {
+                        navigateToLogin();
+                      }
+                    });
+                  }
                 });
+                
+                // Asegurarse de que no navegamos si el widget se desmonta
+                // antes de que se complete el delay
+                addPostFrameCallback() {
+                  if (!mounted) {
+                    shouldNavigate = false;
+                  }
+                }
+                
+                // Registrar el callback para verificar si el widget sigue montado
+                WidgetsBinding.instance.addPostFrameCallback((_) => addPostFrameCallback());
+              } else if (state.status == AuthStatus.error) {
                 // Mostrar mensaje de error
                 _registerController.showResultMessage(
                   isSuccess: false,
@@ -178,6 +262,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                         phoneController: _phoneController,
                         passwordController: _passwordController,
                         confirmPasswordController: _confirmPasswordController,
+                        authMethod: _authMethod,
+                        onAuthMethodChanged: (method) {
+                          setState(() {
+                            _authMethod = method;
+                          });
+                        },
                         isLoading: _isLoading,
                         onSubmit: _handleRegister,
                         fadeInAnimation: _fadeInAnimation,

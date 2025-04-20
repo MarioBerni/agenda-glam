@@ -7,11 +7,11 @@ import 'core/theme/theme.dart';
 import 'data/repositories/user_repository.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/password_reset_page.dart';
-import 'presentation/pages/welcome_after_login_page.dart';
 import 'presentation/pages/welcome_page.dart';
 import 'presentation/pages/auth/login_page.dart';
 import 'presentation/pages/auth/register_page.dart';
-import 'presentation/widgets/app_router.dart';
+import 'presentation/pages/auth/verify_email_page.dart';
+import 'presentation/pages/auth/phone_verification_page.dart';
 import 'presentation/blocs/auth/auth.dart';
 
 // Función para inicializar Firebase
@@ -94,8 +94,12 @@ class MyApp extends StatelessWidget {
               
             case LoginPage.routeName:
               // Ruta para la página de inicio de sesión
+              final args = settings.arguments;
               return MaterialPageRoute(
-                builder: (context) => const LoginPage(),
+                builder: (context) => LoginPage(
+                  // Si hay argumentos y es un booleano, lo pasamos como fromRegistration
+                  fromRegistration: args is bool ? args : false,
+                ),
                 settings: settings,
               );
               
@@ -111,12 +115,23 @@ class MyApp extends StatelessWidget {
           }
         },
         routes: {
-          '/': (context) => const AppRouter(),
-          '/welcome': (context) => const WelcomePage(),
-          '/home': (context) => const HomePage(),
-          '/welcome-after-login': (context) => const WelcomeAfterLoginPage(),
+          '/': (context) => const WelcomePage(),
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegisterPage(),
+          '/home': (context) => const HomePage(),
+          '/password-reset': (context) => const PasswordResetPage(),
+          '/verify-email': (context) => VerifyEmailPage(
+            email: (ModalRoute.of(context)?.settings.arguments as String?) ?? '',
+          ),
+          '/phone-verification': (context) {
+            final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+            return PhoneVerificationPage(
+              verificationId: args?['verificationId'] ?? '',
+              phoneNumber: args?['phoneNumber'] ?? '',
+              password: args?['password'],
+              isForRegistration: args?['isForRegistration'] ?? false,
+            );
+          },
         },
       ),
     );

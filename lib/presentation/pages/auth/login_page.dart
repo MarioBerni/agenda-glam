@@ -14,7 +14,13 @@ class LoginPage extends StatefulWidget {
   /// Ruta para la navegación
   static const String routeName = '/login';
   
-  const LoginPage({super.key});
+  /// Indica si el usuario viene de registrarse (para mostrar mensaje de verificación)
+  final bool fromRegistration;
+  
+  const LoginPage({
+    super.key,
+    this.fromRegistration = false,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -26,6 +32,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _showVerificationMessage = false;
   
   // Controlador para las animaciones
   late AnimationController _animationController;
@@ -51,9 +58,19 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     // Iniciar animaciones
     _animationController.forward();
     
+    // Verificar si viene de registro para mostrar mensaje de verificación
+    _showVerificationMessage = widget.fromRegistration;
+    
     // Inicializar el controlador después de que el widget esté montado
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loginController = LoginController(context: context);
+      
+      // Mostrar mensaje de verificación si viene de registro
+      if (_showVerificationMessage) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _loginController.showVerificationMessage();
+        });
+      }
     });
   }
   
@@ -132,6 +149,22 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       RegisterPage.routeName,
     );
   }
+  
+  /// Manejar la navegación a la página de verificación de email
+  void _handleVerifyEmail() {
+    if (_emailController.text.trim().isNotEmpty) {
+      Navigator.pushNamed(
+        context,
+        '/verify-email',
+        arguments: _emailController.text.trim(),
+      );
+    } else {
+      _loginController.showResultMessage(
+        isSuccess: false,
+        message: 'Por favor, ingresa tu correo electrónico primero',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +193,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 });
                 // Navegar a la página principal
                 Navigator.pushReplacementNamed(context, '/home');
+              } else if (state.status == AuthStatus.emailNotVerified) {
+                setState(() {
+                  _isLoading = false;
+                  _showVerificationMessage = true;
+                });
+                // Mostrar mensaje de verificación
+                _loginController.showVerificationMessage();
               } else if (state.status == AuthStatus.error) {
                 setState(() {
                   _isLoading = false;
@@ -214,6 +254,51 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         fadeInAnimation: _fadeInAnimation,
                         slideAnimation: _slideAnimation,
                       ),
+                      
+                      // Mensaje de verificación si es necesario
+                      if (_showVerificationMessage)
+                        FadeTransition(
+                          opacity: _fadeInAnimation,
+                          child: SlideTransition(
+                            position: _slideAnimation,
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 16),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withValues(alpha: 51), // 0.2 * 255 = 51
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.amber),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    '¿Ya verificaste tu correo electrónico?',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Revisa tu bandeja de entrada y haz clic en el enlace de verificación para activar tu cuenta.',
+                                    style: TextStyle(color: Colors.white70),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextButton(
+                                    onPressed: _handleVerifyEmail,
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.amber,
+                                      foregroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    ),
+                                    child: const Text('Ir a opciones de verificación'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

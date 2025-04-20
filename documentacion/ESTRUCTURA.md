@@ -50,6 +50,8 @@ Directory structure:
     │   ├── ESTRUCTURA.md
     │   ├── OLEADA-IMPLEMENTACIONES-1.md
     │   ├── OLEADA-IMPLEMENTACIONES-2.MD
+    │   ├── OLEADA-IMPLEMENTACIONES-3.md
+    │   ├── OLEADA-IMPLEMENTACIONES-4.md
     │   └── PROYECTO.md
     ├── ios/
     │   ├── .gitignore
@@ -94,13 +96,26 @@ Directory structure:
     │   │   └── theme/
     │   │       └── theme.dart
     │   ├── data/
+    │   │   ├── models/
+    │   │   │   └── user_model.dart
     │   │   ├── repositories/
-    │   │   │   └── auth_repository.dart
+    │   │   │   ├── auth_repository.dart
+    │   │   │   └── user_repository.dart
     │   │   └── services/
-    │   │       └── auth_service.dart
+    │   │       ├── auth_service.dart
+    │   │       └── auth/
+    │   │           ├── auth.dart
+    │   │           ├── auth_exception_handler.dart
+    │   │           ├── auth_models.dart
+    │   │           ├── auth_service.dart
+    │   │           ├── auth_service_interface.dart
+    │   │           ├── email_auth_service.dart
+    │   │           ├── google_auth_service.dart
+    │   │           └── phone_auth_service.dart
     │   ├── domain/
     │   │   └── repositories/
-    │   │       └── auth_repository_interface.dart
+    │   │       ├── auth_repository_interface.dart
+    │   │       └── user_repository_interface.dart
     │   └── presentation/
     │       ├── blocs/
     │       │   └── auth/
@@ -110,19 +125,58 @@ Directory structure:
     │       │       └── auth_state.dart
     │       ├── pages/
     │       │   ├── home_page.dart
+    │       │   ├── password_reset_page.dart
+    │       │   ├── welcome_after_login_page.dart
     │       │   ├── welcome_page.dart
-    │       │   └── auth/
-    │       │       └── login_page.dart
+    │       │   ├── auth/
+    │       │   │   ├── login_page.dart
+    │       │   │   ├── register_page.dart
+    │       │   │   ├── login/
+    │       │   │   │   ├── login_controller.dart
+    │       │   │   │   ├── login_footer.dart
+    │       │   │   │   ├── login_form.dart
+    │       │   │   │   ├── login_header.dart
+    │       │   │   │   ├── login_widgets.dart
+    │       │   │   │   └── social_login_buttons.dart
+    │       │   │   └── register/
+    │       │   │       ├── register_controller.dart
+    │       │   │       ├── register_footer.dart
+    │       │   │       ├── register_form.dart
+    │       │   │       ├── register_header.dart
+    │       │   │       ├── register_widgets.dart
+    │       │   │       └── social_register_buttons.dart
+    │       │   └── password_reset/
+    │       │       ├── animated_container.dart
+    │       │       ├── email_recovery_form.dart
+    │       │       ├── password_reset_controller.dart
+    │       │       ├── password_reset_footer.dart
+    │       │       ├── password_reset_header.dart
+    │       │       ├── password_reset_service.dart
+    │       │       ├── password_reset_widgets.dart
+    │       │       ├── phone_recovery_form.dart
+    │       │       ├── reset_form.dart
+    │       │       ├── success_message.dart
+    │       │       └── verification_code_form.dart
     │       └── widgets/
+    │           ├── app_router.dart
     │           ├── auth/
     │           │   ├── auth_widgets.dart
     │           │   ├── google_sign_in_button.dart
     │           │   ├── login_footer.dart
     │           │   ├── login_form.dart
     │           │   ├── login_header.dart
-    │           │   ├── login_modal.dart
+    │           │   ├── password_strength_indicator.dart
+    │           │   ├── phone_register_form.dart
+    │           │   ├── register_footer.dart
     │           │   ├── register_form.dart
-    │           │   └── register_modal.dart
+    │           │   └── register_header.dart
+    │           ├── common/
+    │           │   ├── animated_background.dart
+    │           │   ├── animated_form_container.dart
+    │           │   └── custom_snackbar.dart
+    │           ├── home/
+    │           │   ├── app_drawer.dart
+    │           │   └── user_profile_card.dart
     │           └── welcome/
     │               ├── action_buttons.dart
     │               ├── benefits_grid.dart

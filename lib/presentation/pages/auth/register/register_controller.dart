@@ -23,6 +23,20 @@ class RegisterController {
     );
   }
   
+  /// Registra un nuevo usuario con número de teléfono
+  void registerWithPhoneNumber({
+    required String phoneNumber,
+    required String password,
+  }) {
+    // Primero solicitar verificación del número de teléfono
+    context.read<AuthBloc>().add(
+      PhoneVerificationRequested(
+        phoneNumber: phoneNumber,
+        isForRegistration: true,
+      ),
+    );
+  }
+  
   /// Registra un nuevo usuario con Google
   void registerWithGoogle() {
     context.read<AuthBloc>().add(GoogleSignInRequested());

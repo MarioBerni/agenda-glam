@@ -10,6 +10,17 @@ class LoginController {
   /// Constructor del controlador
   LoginController({required this.context});
   
+  /// Muestra un mensaje de verificación de correo electrónico
+  void showVerificationMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Por favor, verifica tu correo electrónico para activar tu cuenta'),
+        backgroundColor: Colors.amber,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+  
   /// Inicia sesión con email y contraseña
   void loginWithEmailAndPassword({
     required String email,

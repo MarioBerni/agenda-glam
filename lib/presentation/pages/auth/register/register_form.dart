@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/enums/auth_method.dart';
+import '../../../widgets/auth/phone_input_field.dart';
 
 /// Formulario para la página de registro
 class RegisterForm extends StatefulWidget {
@@ -16,6 +18,12 @@ class RegisterForm extends StatefulWidget {
   
   /// Controlador para el campo de confirmación de contraseña
   final TextEditingController confirmPasswordController;
+  
+  /// Método de autenticación seleccionado
+  final AuthMethod authMethod;
+  
+  /// Callback para cambiar el método de autenticación
+  final Function(AuthMethod) onAuthMethodChanged;
   
   /// Indica si se está procesando la solicitud
   final bool isLoading;
@@ -37,6 +45,8 @@ class RegisterForm extends StatefulWidget {
     required this.phoneController,
     required this.passwordController,
     required this.confirmPasswordController,
+    required this.authMethod,
+    required this.onAuthMethodChanged,
     required this.isLoading,
     required this.onSubmit,
     required this.fadeInAnimation,
@@ -61,6 +71,57 @@ class _RegisterFormState extends State<RegisterForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Selector de método de autenticación - Estilo mejorado
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 8, bottom: 8),
+                  child: Text(
+                    'Elige un método para crear tu cuenta:',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                ),
+                SegmentedButton<AuthMethod>(
+                  segments: const [
+                    ButtonSegment<AuthMethod>(
+                      value: AuthMethod.email,
+                      label: Text('Email'),
+                      icon: Icon(Icons.email),
+                    ),
+                    ButtonSegment<AuthMethod>(
+                      value: AuthMethod.phone,
+                      label: Text('Teléfono'),
+                      icon: Icon(Icons.phone_android),
+                    ),
+                  ],
+                  selected: {widget.authMethod},
+                  onSelectionChanged: (Set<AuthMethod> selection) {
+                    widget.onAuthMethodChanged(selection.first);
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return Colors.amber; // Color seleccionado
+                        }
+                        return Colors.white.withAlpha(13); // Color no seleccionado
+                      },
+                    ),
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return Colors.black; // Texto seleccionado
+                        }
+                        return Colors.white; // Texto no seleccionado
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
             // Campo de nombre
             TextFormField(
               controller: widget.nameController,
@@ -93,40 +154,56 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             const SizedBox(height: 16),
             
-            // Campo de email
-            TextFormField(
-              controller: widget.emailController,
-              keyboardType: TextInputType.emailAddress,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: const Icon(Icons.email, color: Colors.amber),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            // Campo de email o teléfono según el método seleccionado
+            if (widget.authMethod == AuthMethod.email)
+              TextFormField(
+                controller: widget.emailController,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: const Icon(Icons.email, color: Colors.amber),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.white30),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.amber),
+                  ),
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withAlpha(13),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.white30),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.amber),
-                ),
-                labelStyle: const TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: Colors.white.withAlpha(13),
+                validator: (value) {
+                  if (widget.authMethod == AuthMethod.email) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu email';
+                    }
+                    // Validación básica de formato de email
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Por favor ingresa un email válido';
+                    }
+                  }
+                  return null;
+                },
+              )
+            else
+              PhoneInputField(
+                controller: widget.phoneController,
+                validator: (value) {
+                  if (widget.authMethod == AuthMethod.phone) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa tu número de teléfono';
+                    }
+                    // La validación adicional está en el widget PhoneInputField
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa tu email';
-                }
-                // Validación básica de formato de email
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                  return 'Por favor ingresa un email válido';
-                }
-                return null;
-              },
-            ),
             const SizedBox(height: 16),
             
             // Campo de teléfono
