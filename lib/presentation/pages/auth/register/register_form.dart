@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import '../../../../core/enums/auth_method.dart';
 import '../../../widgets/auth/phone_input_field.dart';
+import '../../../pages/legal/terms_conditions_page.dart';
+import '../../../pages/legal/privacy_policy_page.dart';
 
 /// Formulario para la página de registro
 class RegisterForm extends StatefulWidget {
@@ -62,6 +65,26 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
   
+  // Método para mostrar los términos y condiciones
+  void _showTermsAndConditions(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TermsAndConditionsPage(),
+      ),
+    );
+  }
+
+  // Método para mostrar la política de privacidad
+  void _showPrivacyPolicy(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PrivacyPolicyPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -349,10 +372,37 @@ class _RegisterFormState extends State<RegisterForm> {
                   activeColor: Colors.amber,
                   checkColor: Colors.black,
                 ),
-                const Expanded(
-                  child: Text(
-                    'Acepto los términos y condiciones y la política de privacidad',
-                    style: TextStyle(color: Colors.white70),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(color: Colors.white70),
+                      children: [
+                        const TextSpan(text: 'Acepto los '),
+                        TextSpan(
+                          text: 'términos y condiciones',
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _showTermsAndConditions(context);
+                            },
+                        ),
+                        const TextSpan(text: ' y la '),
+                        TextSpan(
+                          text: 'política de privacidad',
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _showPrivacyPolicy(context);
+                            },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

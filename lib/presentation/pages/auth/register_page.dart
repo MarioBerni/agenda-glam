@@ -114,6 +114,8 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
         _registerController.registerWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
+          name: _nameController.text,
+          hasAcceptedTerms: true, // Este valor viene del formulario RegisterForm
         );
       } else {
         // Registro por teléfono - ahora el número ya incluye el código de país

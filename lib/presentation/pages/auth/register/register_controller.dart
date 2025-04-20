@@ -14,11 +14,15 @@ class RegisterController {
   void registerWithEmailAndPassword({
     required String email,
     required String password,
+    required String name,
+    required bool hasAcceptedTerms,
   }) {
     context.read<AuthBloc>().add(
       SignUpRequested(
         email: email,
         password: password,
+        name: name,
+        hasAcceptedTerms: hasAcceptedTerms,
       ),
     );
   }

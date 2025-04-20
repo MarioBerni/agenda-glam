@@ -29,11 +29,22 @@ class GoogleSignInRequested extends AuthEvent {}
 class SignUpRequested extends AuthEvent {
   final String email;
   final String password;
+  final String? name;
+  final String? phoneNumber;
+  final bool hasAcceptedTerms;
+  final String? ipAddress;
 
-  const SignUpRequested({required this.email, required this.password});
+  const SignUpRequested({
+    required this.email,
+    required this.password,
+    this.name,
+    this.phoneNumber,
+    required this.hasAcceptedTerms,
+    this.ipAddress,
+  });
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [email, password, name, phoneNumber, hasAcceptedTerms, ipAddress];
 }
 
 // Evento para cerrar sesión

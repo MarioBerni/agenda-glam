@@ -80,6 +80,7 @@ class _RegisterFormState extends State<RegisterForm> {
             SignUpRequested(
               email: _emailController.text.trim(),
               password: _passwordController.text,
+              hasAcceptedTerms: _acceptTerms,
             ),
           );
     }

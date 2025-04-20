@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
 import '../../../data/repositories/user_repository.dart';
+import '../../../data/repositories/legal_repository.dart';
 import '../../../data/services/auth_service.dart'; // Importamos para acceder a PhoneAuthState
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -11,14 +13,17 @@ import 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
+  final LegalRepository _legalRepository;
   StreamSubscription<User?>? _authStateSubscription;
   StreamSubscription<PhoneAuthState>? _phoneAuthStateSubscription;
 
   AuthBloc({
     AuthRepository? authRepository,
     UserRepository? userRepository,
+    LegalRepository? legalRepository,
   })  : _authRepository = authRepository ?? AuthRepository(),
         _userRepository = userRepository ?? UserRepository(),
+        _legalRepository = legalRepository ?? LegalRepository(),
         super(AuthState.initial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
@@ -168,6 +173,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       SignUpRequested event, Emitter<AuthState> emit,) async {
     emit(AuthState.loading());
     try {
+      // Verificar que se aceptaron los términos y condiciones
+      if (!event.hasAcceptedTerms) {
+        emit(AuthState.error('Debes aceptar los términos y condiciones para registrarte'));
+        return;
+      }
+      
       final userCredential = await _authRepository.createUserWithEmailAndPassword(
         event.email,
         event.password,
@@ -183,6 +194,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // Crear modelo de usuario
       final userModel = UserModel.fromFirebaseUser(userCredential.user!);
       
+      // Registrar el consentimiento legal
+      if (userCredential.user != null) {
+        try {
+          await _legalRepository.registerConsent(
+            userId: userCredential.user!.uid,
+            ipAddress: event.ipAddress,
+          );
+        } catch (legalError) {
+          // Registramos el error pero no interrumpimos el flujo
+          debugPrint('Error al registrar consentimiento legal: $legalError');
+        }
+      }
+      
+      // Enviar email de verificación
+      await _authRepository.sendEmailVerification();
       // Después del registro, el usuario necesita verificar su email
       emit(AuthState.emailVerificationSent(userCredential.user!, userModel: userModel));
     } catch (e) {

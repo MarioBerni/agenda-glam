@@ -53,6 +53,8 @@ dependencies:
   # Utilidades
   logging: ^1.2.0
   intl_phone_field: ^3.2.0
+  device_info_plus: ^11.3.3
+  package_info_plus: ^8.3.0
 
 dev_dependencies:
   flutter_test:
