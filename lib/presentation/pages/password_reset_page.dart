@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/auth/auth.dart';
-import 'password_reset/success_message.dart';
-import 'password_reset/reset_form.dart';
-import 'password_reset/password_reset_controller.dart';
-import 'password_reset/animated_container.dart';
+import '../widgets/common/animated_background.dart';
+import 'password_reset/password_reset_widgets.dart';
 
 /// Enum para los métodos de recuperación de contraseña
 enum RecoveryMethod {
@@ -63,8 +62,17 @@ class _PasswordResetPageState extends State<PasswordResetPage> with SingleTicker
     // Inicializar el estado de resetSent según el parámetro showSuccessMessage
     _resetSent = widget.showSuccessMessage;
     
+    // Configurar la barra de estado para que sea transparente
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ));
+    
     // Configurar animaciones
     _setupAnimations();
+    
+    // Iniciar animaciones
+    _animationController.forward();
     
     // Obtener el email de los argumentos de la ruta, si existe
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -191,25 +199,39 @@ class _PasswordResetPageState extends State<PasswordResetPage> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recuperar Contraseña'),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Recuperar Contraseña',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
       ),
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: _handleAuthStateChanges,
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: _resetSent
-                ? SuccessMessage(
-                    fadeInAnimation: _fadeInAnimation,
-                    slideAnimation: _slideAnimation,
-                    recoveryMethod: _recoveryMethod,
-                    emailAddress: _emailController.text,
-                    phoneNumber: _completePhoneNumber,
-                    phoneStatus: _phoneStatus,
-                    onResendPressed: _handleResendRequest,
-                  )
-                : _buildResetForm(),
+      extendBodyBehindAppBar: true,
+      body: AnimatedBackground(
+        child: SafeArea(
+          child: BlocListener<AuthBloc, AuthState>(
+            listener: _handleAuthStateChanges,
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: _resetSent
+                    ? SuccessMessage(
+                        fadeInAnimation: _fadeInAnimation,
+                        slideAnimation: _slideAnimation,
+                        recoveryMethod: _recoveryMethod,
+                        emailAddress: _emailController.text,
+                        phoneNumber: _completePhoneNumber,
+                        phoneStatus: _phoneStatus,
+                        onResendPressed: _handleResendRequest,
+                      )
+                    : _buildResetForm(),
+              ),
+            ),
           ),
         ),
       ),
@@ -253,30 +275,48 @@ class _PasswordResetPageState extends State<PasswordResetPage> with SingleTicker
   
   /// Construye el formulario de recuperación
   Widget _buildResetForm() {
-    return AnimatedResetContainer(
-      fadeInAnimation: _fadeInAnimation,
-      slideAnimation: _slideAnimation,
-      child: ResetForm(
-        formKey: _formKey,
-        emailController: _emailController,
-        phoneController: _phoneController,
-        smsCodeController: _smsCodeController,
-        recoveryMethod: _recoveryMethod,
-        isLoading: _isLoading,
-        codeSent: _codeSent,
-        onMethodChanged: (method) {
-          setState(() {
-            _recoveryMethod = method;
-          });
-        },
-        onPhoneChanged: (phone) {
-          _completePhoneNumber = phone.completeNumber;
-        },
-        onSubmit: _handleResetRequest,
-        onCancel: () => Navigator.of(context).pop(),
-        fadeInAnimation: _fadeInAnimation,
-        slideAnimation: _slideAnimation,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Encabezado
+        PasswordResetHeader(
+          fadeInAnimation: _fadeInAnimation,
+          slideAnimation: _slideAnimation,
+        ),
+        
+        // Formulario
+        ResetForm(
+          formKey: _formKey,
+          emailController: _emailController,
+          phoneController: _phoneController,
+          smsCodeController: _smsCodeController,
+          recoveryMethod: _recoveryMethod,
+          isLoading: _isLoading,
+          codeSent: _codeSent,
+          onMethodChanged: (method) {
+            setState(() {
+              _recoveryMethod = method;
+            });
+          },
+          onPhoneChanged: (phone) {
+            _completePhoneNumber = phone.completeNumber;
+          },
+          onSubmit: _handleResetRequest,
+          onCancel: () => Navigator.of(context).pop(),
+          fadeInAnimation: _fadeInAnimation,
+          slideAnimation: _slideAnimation,
+        ),
+        
+        const SizedBox(height: 24),
+        
+        // Pie de página
+        PasswordResetFooter(
+          onCancel: () => Navigator.of(context).pop(),
+          fadeInAnimation: _fadeInAnimation,
+          slideAnimation: _slideAnimation,
+        ),
+      ],
     );
   }
 }

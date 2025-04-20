@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'core/theme/theme.dart';
 import 'data/repositories/user_repository.dart';
@@ -8,6 +9,8 @@ import 'presentation/pages/home_page.dart';
 import 'presentation/pages/password_reset_page.dart';
 import 'presentation/pages/welcome_after_login_page.dart';
 import 'presentation/pages/welcome_page.dart';
+import 'presentation/pages/auth/login_page.dart';
+import 'presentation/pages/auth/register_page.dart';
 import 'presentation/widgets/app_router.dart';
 import 'presentation/blocs/auth/auth.dart';
 
@@ -42,6 +45,8 @@ Future<void> main() async {
   // Inicializar Firebase y manejar errores
   try {
     await _initializeFirebase();
+    // Configurar el idioma español para Firebase Auth
+    await FirebaseAuth.instance.setLanguageCode('es');
     // Firebase inicializado exitosamente
   } catch (e) {
     // Error durante la inicialización de Firebase: $e
@@ -76,11 +81,31 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           
           switch (settings.name) {
-            case '/password-reset':
+            case PasswordResetPage.routeName:
+              // Ruta para la página de recuperación de contraseña
+              final args = settings.arguments;
               return MaterialPageRoute(
-                builder: (context) => const PasswordResetPage(),
+                builder: (context) => PasswordResetPage(
+                  // Si hay argumentos y es un booleano, lo pasamos como showSuccessMessage
+                  showSuccessMessage: args is bool ? args : false,
+                ),
                 settings: settings,
               );
+              
+            case LoginPage.routeName:
+              // Ruta para la página de inicio de sesión
+              return MaterialPageRoute(
+                builder: (context) => const LoginPage(),
+                settings: settings,
+              );
+              
+            case RegisterPage.routeName:
+              // Ruta para la página de registro
+              return MaterialPageRoute(
+                builder: (context) => const RegisterPage(),
+                settings: settings,
+              );
+              
             default:
               return null; // Permitir que el sistema de rutas maneje las rutas no especificadas
           }
@@ -89,8 +114,9 @@ class MyApp extends StatelessWidget {
           '/': (context) => const AppRouter(),
           '/welcome': (context) => const WelcomePage(),
           '/home': (context) => const HomePage(),
-          // '/password-reset': (context) => const PasswordResetPage(), // Comentado porque ahora lo manejamos en onGenerateRoute
           '/welcome-after-login': (context) => const WelcomeAfterLoginPage(),
+          '/login': (context) => const LoginPage(),
+          '/register': (context) => const RegisterPage(),
         },
       ),
     );

@@ -76,27 +76,7 @@ class ResetForm extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(
-                Icons.lock_reset,
-                size: 64,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Recupera tu contraseña',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Selecciona un método para recuperar tu contraseña',
-                style: TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
+              // Selector de método de recuperación
               
               // Selector de método de recuperación
               SegmentedButton<RecoveryMethod>(
@@ -147,7 +127,13 @@ class ResetForm extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
                 onPressed: isLoading ? null : onSubmit,
                 child: isLoading
@@ -170,6 +156,9 @@ class ResetForm extends StatelessWidget {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: isLoading ? null : onCancel,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                ),
                 child: const Text('CANCELAR'),
               ),
             ],

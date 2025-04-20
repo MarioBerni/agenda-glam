@@ -1,14 +1,27 @@
-# Oleada de Implementaciones 4: Autenticación por Teléfono
+# Oleada de Implementaciones 4: Autenticación por Teléfono y Mejoras de Diseño
 
-## Fecha: 18 de abril de 2025
+## Fecha: 19 de abril de 2025
 
 ## Resumen
 
-En esta oleada de implementaciones se ha añadido la funcionalidad de autenticación mediante número de teléfono a la aplicación Agenda Glam. Esta característica permite a los usuarios registrarse e iniciar sesión utilizando su número de teléfono, además de la autenticación tradicional por correo electrónico.
+En esta oleada de implementaciones se ha añadido la funcionalidad de autenticación mediante número de teléfono a la aplicación Agenda Glam. Esta característica permite a los usuarios registrarse e iniciar sesión utilizando su número de teléfono, además de la autenticación tradicional por correo electrónico. Adicionalmente, se ha realizado una importante refactorización del código para mejorar la estructura, el diseño y el rendimiento de las páginas de autenticación.
 
 ## Características implementadas
 
-### 1. Autenticación por número de teléfono
+### 1. Refactorización y mejora de la estructura del código
+
+- **Arquitectura modular**: Se ha reorganizado el código de las páginas de autenticación siguiendo un patrón modular consistente.
+- **Componentes reutilizables**: Se han creado componentes específicos para encabezados, formularios y pies de página.
+- **Optimización de rendimiento**: Se ha mejorado el uso de constructores `const` y eliminado código redundante.
+- **Actualización de APIs obsoletas**: Se han reemplazado métodos obsoletos como `withOpacity` por alternativas recomendadas como `withAlpha`.
+
+### 2. Mejoras en el diseño visual
+
+- **Fondo animado unificado**: Implementación de un fondo animado común para todas las páginas de autenticación.
+- **Estilo visual coherente**: Aplicación de una paleta de colores y estilos consistentes en todos los formularios.
+- **Animaciones fluidas**: Mejora de las transiciones y animaciones para una experiencia más agradable.
+
+### 3. Autenticación por número de teléfono
 
 - **Registro de usuarios**: Los usuarios ahora pueden registrarse utilizando su número de teléfono.
 - **Inicio de sesión**: Se ha modificado el formulario de inicio de sesión para aceptar tanto correo electrónico como número de teléfono.
@@ -100,9 +113,53 @@ Si los usuarios no reciben los SMS de verificación:
 2. **Pruebas exhaustivas**: Realizar pruebas con diferentes números de teléfono y escenarios de uso.
 3. **Monitoreo de costos**: Implementar un sistema para monitorear el uso de SMS y los costos asociados.
 4. **Implementación de límites**: Establecer límites para prevenir abusos en el envío de SMS.
+5. **Ampliación de la refactorización**: Extender el patrón de diseño modular a otras secciones de la aplicación.
+6. **Implementación de pruebas unitarias**: Añadir pruebas para los componentes refactorizados.
 
 ## Notas adicionales
 
 - La autenticación por teléfono es menos segura que otros métodos, por lo que se recomienda ofrecer opciones adicionales de seguridad.
 - Se debe informar a los usuarios sobre las tarifas estándar de SMS que podrían aplicarse.
 - Para pruebas en desarrollo, se recomienda usar los números de teléfono de prueba configurados en Firebase.
+
+## Detalles de la refactorización
+
+### Estructura modular implementada
+
+```
+├── pages/
+│   ├── auth/
+│   │   ├── login_page.dart
+│   │   ├── register_page.dart
+│   │   ├── login/
+│   │   │   ├── login_widgets.dart (barrel file)
+│   │   │   ├── login_controller.dart
+│   │   │   ├── login_header.dart
+│   │   │   ├── login_form.dart
+│   │   │   ├── login_footer.dart
+│   │   │   └── social_login_buttons.dart
+│   │   └── register/
+│   │       ├── register_widgets.dart (barrel file)
+│   │       ├── register_controller.dart
+│   │       ├── register_header.dart
+│   │       ├── register_form.dart
+│   │       ├── register_footer.dart
+│   │       └── social_register_buttons.dart
+│   └── password_reset/
+│       ├── password_reset_widgets.dart (barrel file)
+│       ├── password_reset_controller.dart
+│       ├── password_reset_header.dart
+│       ├── reset_form.dart
+│       ├── password_reset_footer.dart
+│       └── ...
+└── widgets/
+    └── common/
+        └── animated_background.dart
+```
+
+### Beneficios de la nueva estructura
+
+- **Mejor mantenibilidad**: Cada componente tiene una responsabilidad única y clara.
+- **Facilidad para pruebas**: La separación de lógica facilita la implementación de pruebas unitarias.
+- **Reutilización de código**: Los componentes pueden ser reutilizados en diferentes partes de la aplicación.
+- **Escalabilidad**: Facilita la adición de nuevas funcionalidades sin afectar el código existente.

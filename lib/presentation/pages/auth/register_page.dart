@@ -4,27 +4,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Importar los widgets y servicios necesarios
 import '../../blocs/auth/auth.dart';
-import '../password_reset_page.dart';
 import '../../widgets/common/animated_background.dart';
-import 'register_page.dart';
-import 'login/login_widgets.dart';
+import 'login_page.dart';
+import 'register/register_widgets.dart';
 
-/// Página de inicio de sesión con diseño mejorado siguiendo el patrón de recuperación de contraseña
-class LoginPage extends StatefulWidget {
+/// Página de registro con diseño moderno y animaciones fluidas
+class RegisterPage extends StatefulWidget {
   /// Ruta para la navegación
-  static const String routeName = '/login';
+  static const String routeName = '/register';
   
-  const LoginPage({super.key});
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderStateMixin {
   // Controladores del formulario
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   
   // Controlador para las animaciones
@@ -32,8 +34,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late Animation<double> _fadeInAnimation;
   late Animation<Offset> _slideAnimation;
   
-  // Controlador de la página de inicio de sesión
-  late LoginController _loginController;
+  // Controlador de la página de registro
+  late RegisterController _registerController;
   
   @override
   void initState() {
@@ -53,14 +55,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     
     // Inicializar el controlador después de que el widget esté montado
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loginController = LoginController(context: context);
+      _registerController = RegisterController(context: context);
     });
   }
   
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -90,46 +95,26 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
   
-  /// Manejar el inicio de sesión
-  void _handleLogin() {
+  /// Manejar el registro
+  void _handleRegister() {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-
-      final identifier = _emailController.text.trim();
       
-      // Determinar si es un email o un teléfono
-      final bool isEmail = identifier.contains('@');
-      
-      // Iniciar sesión con Firebase a través del BLoC
-      if (isEmail) {
-        // Si es un email, usar el método tradicional
-        _loginController.loginWithEmailAndPassword(
-          email: identifier,
-          password: _passwordController.text,
-        );
-      } else {
-        // Si es un teléfono, usar el método de teléfono
-        // Implementación futura
-      }
+      // Registrar con Firebase a través del BLoC
+      _registerController.registerWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
     }
   }
   
-  /// Manejar la navegación a la página de recuperación de contraseña
-  void _handleForgotPassword() {
-    Navigator.pushNamed(
-      context,
-      PasswordResetPage.routeName,
-      arguments: _emailController.text,
-    );
-  }
-  
-  /// Manejar la navegación a la página de registro
-  void _handleRegister() {
+  /// Manejar la navegación a la página de inicio de sesión
+  void _handleLogin() {
     Navigator.pushReplacementNamed(
       context,
-      RegisterPage.routeName,
+      LoginPage.routeName,
     );
   }
 
@@ -144,7 +129,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'Iniciar Sesión',
+          'Crear Cuenta',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -165,9 +150,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   _isLoading = false;
                 });
                 // Mostrar mensaje de error
-                _loginController.showResultMessage(
+                _registerController.showResultMessage(
                   isSuccess: false,
-                  message: state.errorMessage ?? 'Error al iniciar sesión',
+                  message: state.errorMessage ?? 'Error al registrarse',
                 );
               }
             },
@@ -181,18 +166,20 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Encabezado
-                      LoginHeader(
+                      RegisterHeader(
                         fadeInAnimation: _fadeInAnimation,
                         slideAnimation: _slideAnimation,
                       ),
                       
                       // Formulario
-                      LoginForm(
+                      RegisterForm(
+                        nameController: _nameController,
                         emailController: _emailController,
+                        phoneController: _phoneController,
                         passwordController: _passwordController,
+                        confirmPasswordController: _confirmPasswordController,
                         isLoading: _isLoading,
-                        onSubmit: _handleLogin,
-                        onForgotPassword: _handleForgotPassword,
+                        onSubmit: _handleRegister,
                         fadeInAnimation: _fadeInAnimation,
                         slideAnimation: _slideAnimation,
                       ),
@@ -200,8 +187,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       const SizedBox(height: 16),
                       
                       // Botones de redes sociales
-                      SocialLoginButtons(
-                        onGoogleSignIn: () => _loginController.loginWithGoogle(),
+                      SocialRegisterButtons(
+                        onGoogleSignUp: () => _registerController.registerWithGoogle(),
                         fadeInAnimation: _fadeInAnimation,
                         slideAnimation: _slideAnimation,
                       ),
@@ -209,8 +196,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       const SizedBox(height: 24),
                       
                       // Pie de página
-                      LoginFooter(
-                        onRegister: _handleRegister,
+                      RegisterFooter(
+                        onLogin: _handleLogin,
                         fadeInAnimation: _fadeInAnimation,
                         slideAnimation: _slideAnimation,
                       ),

@@ -10,8 +10,23 @@ import 'google_sign_in_button.dart';
 class LoginForm extends StatefulWidget {
   /// Función que se ejecuta cuando se intenta iniciar sesión
   final VoidCallback? onLogin;
+  
+  /// Función que se ejecuta cuando se presiona el botón de olvidar contraseña
+  final VoidCallback? onForgotPassword;
+  
+  /// Animación de fade in para los elementos del formulario
+  final Animation<double>? fadeInAnimation;
+  
+  /// Animación de deslizamiento para los elementos del formulario
+  final Animation<Offset>? slideAnimation;
 
-  const LoginForm({super.key, this.onLogin});
+  const LoginForm({
+    super.key, 
+    this.onLogin,
+    this.onForgotPassword,
+    this.fadeInAnimation,
+    this.slideAnimation,
+  });
 
   @override
   State<LoginForm> createState() => _LoginFormState();

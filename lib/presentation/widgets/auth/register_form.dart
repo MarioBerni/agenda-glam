@@ -11,8 +11,19 @@ import 'password_strength_indicator.dart';
 class RegisterForm extends StatefulWidget {
   /// Función que se ejecuta cuando se completa el registro
   final VoidCallback? onRegister;
+  
+  /// Animación de fade in para los elementos del formulario
+  final Animation<double>? fadeInAnimation;
+  
+  /// Animación de deslizamiento para los elementos del formulario
+  final Animation<Offset>? slideAnimation;
 
-  const RegisterForm({super.key, this.onRegister});
+  const RegisterForm({
+    super.key, 
+    this.onRegister,
+    this.fadeInAnimation,
+    this.slideAnimation,
+  });
 
   @override
   State<RegisterForm> createState() => _RegisterFormState();
