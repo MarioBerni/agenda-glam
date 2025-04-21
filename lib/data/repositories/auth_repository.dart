@@ -1,13 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
+
 import '../../domain/repositories/auth_repository_interface.dart';
-import '../services/auth_service.dart';
+import '../services/auth/auth_models.dart';
+import '../services/auth/auth_service_interface.dart';
 
 /// Implementación del repositorio de autenticación
+@LazySingleton(as: AuthRepositoryInterface)
 class AuthRepository implements AuthRepositoryInterface {
-  final AuthService _authService;
+  final AuthServiceInterface _authService;
 
-  AuthRepository({AuthService? authService})
-      : _authService = authService ?? AuthService();
+  AuthRepository(this._authService);
 
   @override
   Stream<User?> get authStateChanges => _authService.authStateChanges;

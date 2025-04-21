@@ -1,14 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
 import 'package:logging/logging.dart';
 
 import 'auth_exception_handler.dart';
 
 /// Servicio especializado para autenticación con email y contraseña
+@injectable
 class EmailAuthService {
   final FirebaseAuth _auth;
   final Logger _logger = Logger('EmailAuthService');
 
-  EmailAuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
+  EmailAuthService(this._auth);
 
   /// Iniciar sesión con email y contraseña
   Future<UserCredential> signInWithEmailAndPassword(

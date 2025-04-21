@@ -1,12 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../repositories/legal_repository.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../domain/repositories/legal_repository_interface.dart';
 import '../../presentation/pages/legal/terms_update_page.dart';
 
 /// Servicio para verificar si el usuario necesita aceptar términos actualizados
+@injectable
 class TermsVerificationService {
-  final LegalRepository _legalRepository = LegalRepository();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final LegalRepositoryInterface _legalRepository;
+  final FirebaseAuth _auth;
+  
+  TermsVerificationService(this._legalRepository, this._auth);
 
   /// Verifica si hay términos actualizados que el usuario necesita aceptar
   Future<void> checkForUpdatedTerms(BuildContext context) async {
@@ -18,7 +23,7 @@ class TermsVerificationService {
       }
 
       // Verificar si el usuario necesita aceptar nuevos términos
-      final needsToAccept = await _legalRepository.needsToAcceptNewTerms(user.uid);
+      final needsToAccept = !(await _legalRepository.hasAcceptedLatestTerms(user.uid));
       
       if (needsToAccept && context.mounted) {
         // Mostrar la página de términos actualizados

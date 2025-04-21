@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:injectable/injectable.dart';
 import 'package:logging/logging.dart';
 
 import 'auth_exception_handler.dart';
 import 'auth_models.dart';
 
 /// Servicio especializado para autenticación con número de teléfono
+@injectable
 class PhoneAuthService {
   final FirebaseAuth _auth;
   final Logger _logger = Logger('PhoneAuthService');
@@ -18,7 +20,7 @@ class PhoneAuthService {
   /// Stream que emite cambios en el estado de autenticación por teléfono
   Stream<PhoneAuthState> get phoneAuthStateChanges => _phoneAuthStateController.stream;
 
-  PhoneAuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
+  PhoneAuthService(this._auth);
 
   /// Iniciar sesión o registrar usuario con número de teléfono
   Future<void> verifyPhoneNumber({

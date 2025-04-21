@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../domain/repositories/user_repository_interface.dart';
 
+@LazySingleton(as: UserRepositoryInterface)
 class UserRepository implements UserRepositoryInterface {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
+  
+  UserRepository(this._firestore, this._auth);
 
   @override
   User? get currentUser => _auth.currentUser;

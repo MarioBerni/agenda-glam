@@ -1,20 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:injectable/injectable.dart';
 import 'package:logging/logging.dart';
 
 import 'auth_exception_handler.dart';
 import 'auth_models.dart';
 
 /// Servicio especializado para autenticación con Google
+@injectable
 class GoogleAuthService {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
   final Logger _logger = Logger('GoogleAuthService');
 
-  GoogleAuthService({FirebaseAuth? auth, GoogleSignIn? googleSignIn}) 
-    : _auth = auth ?? FirebaseAuth.instance,
-      _googleSignIn = googleSignIn ?? GoogleSignIn(scopes: ['email']);
+  GoogleAuthService(this._auth, this._googleSignIn);
 
   /// Iniciar sesión con Google
   Future<UserCredential> signInWithGoogle() async {

@@ -2,29 +2,29 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+
 import '../../../data/models/user_model.dart';
-import '../../../data/repositories/auth_repository.dart';
-import '../../../data/repositories/user_repository.dart';
-import '../../../data/repositories/legal_repository.dart';
-import '../../../data/services/auth_service.dart'; // Importamos para acceder a PhoneAuthState
+import '../../../domain/repositories/auth_repository_interface.dart';
+import '../../../domain/repositories/user_repository_interface.dart';
+import '../../../domain/repositories/legal_repository_interface.dart';
+import '../../../data/services/auth/auth_models.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
+@injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository _authRepository;
-  final UserRepository _userRepository;
-  final LegalRepository _legalRepository;
+  final AuthRepositoryInterface _authRepository;
+  final UserRepositoryInterface _userRepository;
+  final LegalRepositoryInterface _legalRepository;
   StreamSubscription<User?>? _authStateSubscription;
   StreamSubscription<PhoneAuthState>? _phoneAuthStateSubscription;
 
-  AuthBloc({
-    AuthRepository? authRepository,
-    UserRepository? userRepository,
-    LegalRepository? legalRepository,
-  })  : _authRepository = authRepository ?? AuthRepository(),
-        _userRepository = userRepository ?? UserRepository(),
-        _legalRepository = legalRepository ?? LegalRepository(),
-        super(AuthState.initial()) {
+  AuthBloc(
+    this._authRepository,
+    this._userRepository,
+    this._legalRepository,
+  ) : super(AuthState.initial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignInRequested>(_onSignInRequested);
     on<GoogleSignInRequested>(_onGoogleSignInRequested);

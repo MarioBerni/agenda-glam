@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_it/get_it.dart';
+
+import 'core/di/injection.dart';
 import 'firebase_options.dart';
 import 'core/theme/theme.dart';
-import 'data/repositories/user_repository.dart';
+
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/password_reset_page.dart';
 import 'presentation/pages/welcome_page.dart';
@@ -47,6 +50,10 @@ Future<void> main() async {
     await _initializeFirebase();
     // Configurar el idioma español para Firebase Auth
     await FirebaseAuth.instance.setLanguageCode('es');
+    
+    // Configurar la inyección de dependencias
+    configureDependencies();
+    
     // Firebase inicializado exitosamente
   } catch (e) {
     // Error durante la inicialización de Firebase: $e
@@ -64,13 +71,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Crear instancias de repositorios
-    final userRepository = UserRepository();
+    // Configuración con inyección de dependencias ya inicializada
     
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(userRepository: userRepository)..add(AuthCheckRequested()),
+          create: (context) => GetIt.instance<AuthBloc>()..add(AuthCheckRequested()),
         ),
       ],
       child: MaterialApp(

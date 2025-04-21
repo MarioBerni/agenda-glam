@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:injectable/injectable.dart';
 import 'package:logging/logging.dart';
 
 import 'auth_exception_handler.dart';
@@ -10,6 +11,7 @@ import 'google_auth_service.dart';
 import 'phone_auth_service.dart';
 
 /// Servicio principal de autenticación que integra todos los servicios especializados
+@LazySingleton(as: AuthServiceInterface)
 class AuthService implements AuthServiceInterface {
   final FirebaseAuth _auth;
   final EmailAuthService _emailAuthService;
@@ -17,16 +19,13 @@ class AuthService implements AuthServiceInterface {
   final PhoneAuthService _phoneAuthService;
   final Logger _logger = Logger('AuthService');
 
-  /// Constructor con inyección de dependencias para facilitar pruebas
-  AuthService({
-    FirebaseAuth? auth,
-    EmailAuthService? emailAuthService,
-    GoogleAuthService? googleAuthService,
-    PhoneAuthService? phoneAuthService,
-  }) : _auth = auth ?? FirebaseAuth.instance,
-       _emailAuthService = emailAuthService ?? EmailAuthService(auth: auth),
-       _googleAuthService = googleAuthService ?? GoogleAuthService(auth: auth),
-       _phoneAuthService = phoneAuthService ?? PhoneAuthService(auth: auth);
+  /// Constructor con inyección de dependencias
+  AuthService(
+    this._auth,
+    this._emailAuthService,
+    this._googleAuthService,
+    this._phoneAuthService,
+  );
 
   @override
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -38,6 +37,7 @@ class AuthService implements AuthServiceInterface {
   bool get isEmailVerified => _emailAuthService.isEmailVerified();
 
   /// Stream que emite cambios en el estado de autenticación por teléfono
+  @override
   Stream<PhoneAuthState> get phoneAuthStateChanges => _phoneAuthService.phoneAuthStateChanges;
 
   @override
@@ -89,6 +89,7 @@ class AuthService implements AuthServiceInterface {
   }
 
   /// Iniciar sesión o registrar usuario con número de teléfono
+  @override
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
     required Function(String) onCodeSent,
@@ -106,6 +107,7 @@ class AuthService implements AuthServiceInterface {
   }
 
   /// Verificar el código SMS recibido
+  @override
   Future<UserCredential> verifyPhoneSmsCode({
     required String verificationId,
     required String smsCode,
@@ -121,6 +123,7 @@ class AuthService implements AuthServiceInterface {
   }
 
   /// Enviar código de recuperación de contraseña por SMS
+  @override
   Future<void> sendPasswordResetBySms({
     required String phoneNumber,
     required Function(String) onCodeSent,
@@ -136,6 +139,7 @@ class AuthService implements AuthServiceInterface {
   }
 
   /// Actualizar contraseña después de verificación por teléfono
+  @override
   Future<void> updatePasswordAfterPhoneVerification({
     required String verificationId,
     required String smsCode,

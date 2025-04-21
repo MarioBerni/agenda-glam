@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+
 import '../../../data/models/legal_document_model.dart';
-import '../../../data/repositories/legal_repository.dart';
+import '../../../domain/repositories/legal_repository_interface.dart';
 
 /// Página para mostrar y solicitar aceptación de términos actualizados
 class TermsUpdatePage extends StatefulWidget {
@@ -18,7 +20,7 @@ class TermsUpdatePage extends StatefulWidget {
 }
 
 class _TermsUpdatePageState extends State<TermsUpdatePage> {
-  final LegalRepository _legalRepository = LegalRepository();
+  late final LegalRepositoryInterface _legalRepository;
   bool _isLoading = true;
   bool _hasAccepted = false;
   bool _isSubmitting = false;
@@ -29,6 +31,7 @@ class _TermsUpdatePageState extends State<TermsUpdatePage> {
   @override
   void initState() {
     super.initState();
+    _legalRepository = GetIt.instance<LegalRepositoryInterface>();
     _loadDocuments();
   }
   
@@ -76,8 +79,10 @@ class _TermsUpdatePageState extends State<TermsUpdatePage> {
       });
       
       try {
-        await _legalRepository.registerConsent(
+        await _legalRepository.acceptNewTermsVersion(
           userId: widget.userId,
+          termsVersion: _termsDocument?.version ?? '1.0',
+          privacyPolicyVersion: _privacyDocument?.version ?? '1.0',
         );
         
         if (mounted) {

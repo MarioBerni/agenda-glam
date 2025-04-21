@@ -1,14 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:injectable/injectable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
 import '../models/legal_consent_model.dart';
 import '../models/legal_document_model.dart';
 
 /// Servicio para gestionar documentos legales y consentimientos
+@injectable
 class LegalService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  final FirebaseFirestore _firestore;
+  final DeviceInfoPlugin _deviceInfo;
+  
+  LegalService(this._firestore) : _deviceInfo = DeviceInfoPlugin();
 
   /// Colección de documentos legales
   final String _legalDocumentsCollection = 'legal_documents';
@@ -69,15 +74,15 @@ class LegalService {
   Future<void> registerConsent({
     required String userId,
     String? ipAddress,
+    String? termsVersion,
+    String? privacyPolicyVersion,
   }) async {
     try {
-      // Obtener las versiones actuales de los documentos
-      final termsVersion = await getCurrentDocumentVersion(
-        LegalDocumentType.termsAndConditions,
-      );
-      final privacyVersion = await getCurrentDocumentVersion(
-        LegalDocumentType.privacyPolicy,
-      );
+      // Usar las versiones proporcionadas o obtener las actuales
+      final finalTermsVersion = termsVersion ?? 
+          await getCurrentDocumentVersion(LegalDocumentType.termsAndConditions);
+      final finalPrivacyVersion = privacyPolicyVersion ?? 
+          await getCurrentDocumentVersion(LegalDocumentType.privacyPolicy);
 
       // Obtener información del dispositivo
       final deviceInfoStr = await _getDeviceInfo();
@@ -86,8 +91,8 @@ class LegalService {
       final consent = LegalConsentModel(
         id: '', // Firestore generará el ID
         userId: userId,
-        termsVersion: termsVersion,
-        privacyVersion: privacyVersion,
+        termsVersion: finalTermsVersion,
+        privacyVersion: finalPrivacyVersion,
         consentDate: DateTime.now(),
         ipAddress: ipAddress,
         deviceInfo: deviceInfoStr,
