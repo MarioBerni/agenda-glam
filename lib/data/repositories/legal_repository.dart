@@ -37,11 +37,13 @@ class LegalRepository implements LegalRepositoryInterface {
   }
 
   /// Obtiene el historial de consentimientos de un usuario
+  @override
   Future<List<LegalConsentModel>> getUserConsentHistory(String userId) async {
     return await _legalService.getUserConsentHistory(userId);
   }
 
   /// Obtiene el historial de versiones de un tipo de documento
+  @override
   Future<List<LegalDocumentModel>> getDocumentVersionHistory(
     LegalDocumentType type,
   ) async {
@@ -79,6 +81,7 @@ class LegalRepository implements LegalRepositoryInterface {
   }
 
   /// Crea una nueva versión de un documento legal
+  @override
   Future<void> createNewDocumentVersion({
     required LegalDocumentType type,
     required String version,

@@ -1,4 +1,5 @@
 import '../../data/models/legal_document_model.dart';
+import '../../data/models/legal_consent_model.dart';
 
 /// Interfaz para el repositorio de gestión legal
 abstract class LegalRepositoryInterface {
@@ -26,5 +27,22 @@ abstract class LegalRepositoryInterface {
     required String termsVersion,
     required String privacyPolicyVersion,
     String? ipAddress,
+  });
+  
+  /// Obtiene el historial de consentimientos de un usuario
+  Future<List<LegalConsentModel>> getUserConsentHistory(String userId);
+
+  /// Obtiene el historial de versiones de un tipo de documento
+  Future<List<LegalDocumentModel>> getDocumentVersionHistory(
+    LegalDocumentType type,
+  );
+
+  /// Crea una nueva versión de un documento legal
+  Future<void> createNewDocumentVersion({
+    required LegalDocumentType type,
+    required String version,
+    required String title,
+    required String content,
+    String? documentUrl,
   });
 }

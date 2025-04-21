@@ -75,6 +75,10 @@ dev_dependencies:
   # Generadores para inyección de dependencias
   build_runner: ^2.4.8
   injectable_generator: ^2.4.1
+  
+  # Pruebas unitarias
+  mockito: ^5.4.4
+  test: ^1.24.9
 
 # Solución para el problema de PromiseJsImpl en Firebase para web
 dependency_overrides:

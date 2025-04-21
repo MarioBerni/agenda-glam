@@ -1,5 +1,5 @@
 # Agenda Glam - Informe del Proyecto
-Fecha: 12 de abril de 2025
+Fecha: 21 de abril de 2025
 
 ## Introducción a Agenda Glam
 
@@ -143,20 +143,35 @@ El modelo de negocio se sustentará en suscripciones para proveedores, comisione
 lib/
 ├── core/                  # Funcionalidades centrales y utilidades
 │   ├── constants/         # Constantes de la aplicación
+│   ├── di/                # Inyección de dependencias
+│   │   ├── injection.dart # Configuración de Get_It
+│   │   └── modules/       # Módulos de inyección
+│   ├── enums/             # Enumeraciones globales
 │   ├── theme/             # Configuración del tema
 │   └── utils/             # Funciones de utilidad
 ├── data/                  # Capa de datos
 │   ├── models/            # Modelos de datos
 │   ├── repositories/      # Implementaciones de repositorios
 │   └── services/          # Servicios externos (Firebase, etc.)
+│       └── auth/          # Servicios de autenticación
 ├── domain/                # Lógica de negocio
 │   ├── entities/          # Entidades de dominio
 │   ├── repositories/      # Interfaces de repositorios
 │   └── usecases/          # Casos de uso
 ├── presentation/          # Capa de presentación
 │   ├── blocs/             # BLoCs para gestión de estado
+│   │   └── auth/          # BLoC de autenticación
 │   ├── pages/             # Páginas de la aplicación
+│   │   ├── auth/          # Páginas de autenticación
+│   │   │   ├── login/     # Componentes de login
+│   │   │   └── register/  # Componentes de registro
+│   │   ├── legal/         # Páginas de documentos legales
+│   │   └── password_reset/# Páginas de recuperación de contraseña
 │   └── widgets/           # Widgets reutilizables
+│       ├── auth/          # Widgets de autenticación
+│       ├── common/        # Widgets comunes
+│       ├── home/          # Widgets de la página principal
+│       └── welcome/       # Widgets de bienvenida
 └── main.dart              # Punto de entrada de la aplicación
 ```
 
@@ -172,67 +187,36 @@ Se recomienda utilizar el patrón BLoC (Business Logic Component) para la gesti�
 
 ### Estado Actual
 
-- El entorno de desarrollo está configurado para Flutter en Windows.
-- Se han instalado Android Studio, el SDK de Flutter y las herramientas necesarias.
-- Se ha creado un emulador de Android (Pixel 7 con Android 14) para pruebas.
-- El equipo está listo para iniciar el desarrollo del MVP (Producto Mínimo Viable).
+- El proyecto se encuentra en fase de desarrollo activo con siete oleadas de implementación completadas.
+- Se ha implementado un sistema completo de autenticación con múltiples métodos (email, Google, teléfono).
+- Se ha desarrollado un sistema de consentimiento legal con versionado de documentos.
+- Se ha implementado un sistema de inyección de dependencias utilizando get_it y injectable.
+- La arquitectura sigue los principios de Clean Architecture con separación clara de responsabilidades.
+- El proyecto utiliza el patrón BLoC para la gestión de estado, siguiendo las mejores prácticas.
 
-### Implementaciones Realizadas
-
-El desarrollo del proyecto se ha organizado en oleadas de implementación, cada una enfocada en aspectos específicos de la aplicación. Hasta la fecha, se han completado las siguientes oleadas:
-
-1. **Oleada 1**: Estructura inicial del proyecto, configuración de Firebase y autenticación básica.
-2. **Oleada 2**: Optimización y modularización del código, implementación completa de autenticación con Firebase.
-3. **Oleada 3**: Mejora de la experiencia post-autenticación, integración con Firestore y manejo de perfiles de usuario.
-4. **Oleada 4**: Implementación de autenticación por teléfono y mejoras de diseño visual.
-5. **Oleada 5**: Mejoras en la interfaz de usuario para autenticación por teléfono y correcciones de código.
-6. **Oleada 6**: Sistema de consentimiento legal, versionado de documentos y páginas dedicadas para términos y condiciones.
 
 ## Plan de Pruebas
 
 ### Pruebas Unitarias
 - Validación de modelos y lógica de negocio
 - Verificación de casos de uso y repositorios
+- Pruebas de servicios de autenticación
+- Pruebas de BLoCs con estados y eventos
 
 ### Pruebas de Integración
 - Interacción entre componentes
 - Flujos de datos entre capas
+- Integración con Firebase
 
 ### Pruebas de UI
 - Validación de interfaces y experiencia de usuario
 - Pruebas de responsividad en diferentes dispositivos
+- Pruebas de accesibilidad
 
 ### Pruebas de Aceptación
 - Validación de flujos completos de usuario
 - Verificación de requisitos funcionales
-
-## Documentación de Oleadas de Implementación
-
-### Propósito y Estructura
-
-Los archivos de oleadas de implementación (`OLEADA-IMPLEMENTACIONES-X.md`) tienen como objetivo documentar de manera detallada y estructurada las funcionalidades que ya han sido implementadas y confirmadas en el proyecto. Estos documentos:
-
-- **Registran el progreso real**: Documentan exclusivamente las implementaciones completadas y verificadas, no las planificadas o pendientes.
-- **Sirven como referencia técnica**: Proporcionan detalles sobre la arquitectura, patrones de diseño y decisiones técnicas tomadas.
-- **Facilitan la incorporación de nuevos desarrolladores**: Ofrecen una visión clara de cómo está construido el sistema.
-- **Ayudan en el mantenimiento**: Permiten entender rápidamente qué componentes existen y cómo interactúan.
-
-### Contenido de los Archivos de Oleadas
-
-Cada archivo de oleada típicamente incluye:
-
-1. **Resumen general**: Visión general de lo implementado en esa oleada.
-2. **Funcionalidades implementadas**: Lista detallada de características completadas.
-3. **Detalles técnicos**: Información sobre la implementación, patrones utilizados y componentes creados.
-4. **Archivos creados/modificados**: Registro de los cambios realizados en el código.
-5. **Problemas encontrados y soluciones**: Documentación de desafíos técnicos y cómo fueron resueltos.
-
-### Beneficios de la Documentación por Oleadas
-
-- **Trazabilidad**: Permite seguir la evolución del proyecto a lo largo del tiempo.
-- **Transparencia**: Proporciona una visión clara de lo que realmente está implementado.
-- **Calidad**: Ayuda a mantener estándares de documentación consistentes.
-- **Comunicación**: Facilita la comunicación entre miembros del equipo y stakeholders.
+- Pruebas de rendimiento en condiciones reales
 
 ## Conclusión
 
