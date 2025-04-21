@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../blocs/auth/auth.dart';
 import '../common/animated_form_container.dart';
 import '../common/custom_snackbar.dart';
-import 'google_sign_in_button.dart';
 
 /// Widget que contiene el formulario de inicio de sesión con campos de texto,
 /// opción de recordar contraseña y botón de inicio de sesión.
@@ -314,8 +314,49 @@ class _LoginFormState extends State<LoginForm> {
                   
                   const SizedBox(height: 16.0),
                   
-                  // Botón de Google
-                  GoogleSignInButton(onSignIn: widget.onLogin),
+                  // Botón de Google con diseño oficial
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black87,
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      onPressed: () {
+                        context.read<AuthBloc>().add(GoogleSignInRequested());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Logo de Google
+                            SvgPicture.asset(
+                              'assets/images/google_logo.svg',
+                              height: 24,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            // Texto del botón con estilo oficial
+                            const Text(
+                              'Continuar con Google',
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                letterSpacing: 0.25,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -229,38 +229,16 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             const SizedBox(height: 16),
             
-            // Campo de teléfono
-            TextFormField(
-              controller: widget.phoneController,
-              keyboardType: TextInputType.phone,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Teléfono',
-                prefixIcon: const Icon(Icons.phone, color: Colors.amber),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.white30),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.amber),
-                ),
-                labelStyle: const TextStyle(color: Colors.white70),
-                hintText: 'Incluye el código de país (ej: +598)',
-                hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
-                filled: true,
-                fillColor: Colors.white.withAlpha(13),
+            // Campo de teléfono (solo visible en registro por email)
+            if (widget.authMethod == AuthMethod.email)
+              PhoneInputField(
+                controller: widget.phoneController,
+                validator: (value) {
+                  // Validación opcional para teléfono en registro por email
+                  // No es obligatorio cuando el método principal es email
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa tu teléfono';
-                }
-                return null;
-              },
-            ),
             const SizedBox(height: 16),
             
             // Campo de contraseña

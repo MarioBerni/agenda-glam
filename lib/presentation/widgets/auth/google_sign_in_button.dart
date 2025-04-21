@@ -11,9 +11,6 @@ class GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated && 
@@ -22,23 +19,31 @@ class GoogleSignInButton extends StatelessWidget {
           onSignIn!();
         }
       },
-      child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 50),
-          side: BorderSide(color: colorScheme.outline),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: Colors.white70, width: 1),
+            ),
+          ),
+          onPressed: () {
+            context.read<AuthBloc>().add(GoogleSignInRequested());
+          },
+          child: const Text(
+            'Continuar con Google',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Colors.white,
+            ),
           ),
         ),
-        icon: const Icon(
-          Icons.g_mobiledata,
-          size: 24,
-          color: Colors.blue,
-        ),
-        label: const Text('Continuar con Google'),
-        onPressed: () {
-          context.read<AuthBloc>().add(GoogleSignInRequested());
-        },
       ),
     );
   }

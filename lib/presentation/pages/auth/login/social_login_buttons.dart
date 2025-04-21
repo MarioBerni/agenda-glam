@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Botones de inicio de sesión con redes sociales
 class SocialLoginButtons extends StatelessWidget {
@@ -44,19 +45,43 @@ class SocialLoginButtons extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            // Botón de inicio de sesión con Google
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.white30),
+            // Botón de inicio de sesión con Google (diseño oficial)
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
                 minimumSize: const Size(double.infinity, 56),
+                elevation: 1,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                foregroundColor: Colors.white,
               ),
               onPressed: onGoogleSignIn,
-              icon: const Icon(Icons.g_mobiledata, size: 24, color: Colors.amber),
-              label: const Text('Continuar con Google'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo de Google
+                    SvgPicture.asset(
+                      'assets/images/google_logo.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    // Texto del botón con estilo oficial
+                    const Text(
+                      'Continuar con Google',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        letterSpacing: 0.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

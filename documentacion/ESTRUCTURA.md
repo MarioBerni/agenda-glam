@@ -52,6 +52,8 @@ Directory structure:
     │   ├── OLEADA-IMPLEMENTACIONES-2.MD
     │   ├── OLEADA-IMPLEMENTACIONES-3.md
     │   ├── OLEADA-IMPLEMENTACIONES-4.md
+    │   ├── OLEADA-IMPLEMENTACIONES-5.md
+    │   ├── OLEADA-IMPLEMENTACIONES-6.md
     │   └── PROYECTO.md
     ├── ios/
     │   ├── .gitignore
@@ -93,16 +95,23 @@ Directory structure:
     │   ├── firebase_options.dart
     │   ├── main.dart
     │   ├── core/
+    │   │   ├── enums/
+    │   │   │   └── auth_method.dart
     │   │   └── theme/
     │   │       └── theme.dart
     │   ├── data/
     │   │   ├── models/
+    │   │   │   ├── legal_consent_model.dart
+    │   │   │   ├── legal_document_model.dart
     │   │   │   └── user_model.dart
     │   │   ├── repositories/
     │   │   │   ├── auth_repository.dart
+    │   │   │   ├── legal_repository.dart
     │   │   │   └── user_repository.dart
     │   │   └── services/
     │   │       ├── auth_service.dart
+    │   │       ├── legal_service.dart
+    │   │       ├── terms_verification_service.dart
     │   │       └── auth/
     │   │           ├── auth.dart
     │   │           ├── auth_exception_handler.dart
@@ -130,7 +139,9 @@ Directory structure:
     │       │   ├── welcome_page.dart
     │       │   ├── auth/
     │       │   │   ├── login_page.dart
+    │       │   │   ├── phone_verification_page.dart
     │       │   │   ├── register_page.dart
+    │       │   │   ├── verify_email_page.dart
     │       │   │   ├── login/
     │       │   │   │   ├── login_controller.dart
     │       │   │   │   ├── login_footer.dart
@@ -145,6 +156,10 @@ Directory structure:
     │       │   │       ├── register_header.dart
     │       │   │       ├── register_widgets.dart
     │       │   │       └── social_register_buttons.dart
+    │       │   ├── legal/
+    │       │   │   ├── privacy_policy_page.dart
+    │       │   │   ├── terms_conditions_page.dart
+    │       │   │   └── terms_update_page.dart
     │       │   └── password_reset/
     │       │       ├── animated_container.dart
     │       │       ├── email_recovery_form.dart
@@ -166,10 +181,12 @@ Directory structure:
     │           │   ├── login_form.dart
     │           │   ├── login_header.dart
     │           │   ├── password_strength_indicator.dart
+    │           │   ├── phone_input_field.dart
     │           │   ├── phone_register_form.dart
     │           │   ├── register_footer.dart
     │           │   ├── register_form.dart
-    │           │   └── register_header.dart
+    │           │   ├── register_header.dart
+    │           │   └── sms_code_input.dart
     │           ├── common/
     │           │   ├── animated_background.dart
     │           │   ├── animated_form_container.dart

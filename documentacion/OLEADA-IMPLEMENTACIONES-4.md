@@ -1,6 +1,6 @@
 # Oleada de Implementaciones 4: Autenticación por Teléfono y Mejoras de Diseño
 
-## Fecha: 19 de abril de 2025
+## Fecha: 20 de abril de 2025 (actualizado)
 
 ## Resumen
 
@@ -107,14 +107,7 @@ Si los usuarios no reciben los SMS de verificación:
 2. Comprobar que no se haya excedido la cuota de SMS en Firebase.
 3. Verificar que el país del usuario esté habilitado para recibir SMS de Firebase.
 
-## Próximos pasos
 
-1. **Mejora de la experiencia de usuario**: Refinar la interfaz y los flujos de autenticación basados en la retroalimentación de los usuarios.
-2. **Pruebas exhaustivas**: Realizar pruebas con diferentes números de teléfono y escenarios de uso.
-3. **Monitoreo de costos**: Implementar un sistema para monitorear el uso de SMS y los costos asociados.
-4. **Implementación de límites**: Establecer límites para prevenir abusos en el envío de SMS.
-5. **Ampliación de la refactorización**: Extender el patrón de diseño modular a otras secciones de la aplicación.
-6. **Implementación de pruebas unitarias**: Añadir pruebas para los componentes refactorizados.
 
 ## Notas adicionales
 

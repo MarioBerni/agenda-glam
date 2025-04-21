@@ -251,38 +251,6 @@ graph TD
    - **Solución**: Modificación de los modales de inicio de sesión y registro para navegar a la ruta principal después de cerrar el modal
    - **Aprendizaje**: Asegurar que los componentes de UI permitan que el router maneje la navegación basada en el estado
 
-### Próximos Pasos
-
-1. **Sistema de Reservas**
-   - Desarrollar la funcionalidad principal de reserva de servicios
-   - Implementar calendario y selección de horarios
-   - Crear notificaciones para recordatorios
-
-2. **Implementación de Edición de Perfil**
-   - Crear una pantalla dedicada para editar información del usuario
-   - Permitir la carga de fotos de perfil
-   - Implementar validación de campos
-
-3. **Autenticación Biométrica**
-   - Implementar inicio de sesión con huella digital/reconocimiento facial
-   - Mejorar la seguridad y comodidad del proceso de autenticación
-   - Integrar con el sistema de persistencia de sesión
-
-4. **Sistema de Notificaciones In-App**
-   - Desarrollar un centro de notificaciones dentro de la aplicación
-   - Implementar notificaciones push para recordatorios de citas
-   - Crear un sistema de mensajería entre usuarios y proveedores de servicios
-
-5. **Optimizaciones de Rendimiento**
-   - Implementar caché local para datos frecuentemente utilizados
-   - Mejorar la carga inicial de la aplicación
-   - Optimizar consultas a Firestore
-
-6. **Alternativas para Recuperación por SMS**
-   - Investigar integración con WhatsApp Business API para envío de códigos
-   - Evaluar servicios como Twilio para reducir costos de envío de mensajes
-   - Implementar solución híbrida Firebase + proveedor externo
-
 ---
 
-*Documentación actualizada: 18 de abril de 2025 (13:00)*
+*Documentación actualizada: 20 de abril de 2025 (18:28)*

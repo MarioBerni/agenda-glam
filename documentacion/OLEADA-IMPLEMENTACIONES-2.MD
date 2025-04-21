@@ -81,8 +81,8 @@
    - Integración de Firebase en la aplicación Flutter.
    - Configuración de métodos de autenticación en la consola de Firebase:
      - Email/Password: Implementado y funcional.
+     - Autenticación por teléfono: Implementado y funcional con verificación SMS.
      - Google Sign-In: Configurado para implementación futura.
-     - Autenticación por teléfono: Configurado para implementación futura.
 
 2. **Arquitectura de Autenticación**
    - Implementación siguiendo el patrón de arquitectura limpia:
@@ -143,8 +143,8 @@
 ### Próximos Pasos
 
 1. **Implementación de Métodos de Autenticación Adicionales**
-   - Completar la implementación de Google Sign-In.
-   - Implementar la autenticación por teléfono con verificación SMS.
+   - ✅ Implementar la autenticación por teléfono con verificación SMS. **COMPLETADO**
+   - ✅ Implementar Google Sign-In. **COMPLETADO**
 
 2. **Mejoras en la Experiencia de Usuario**
    - Añadir animaciones en las transiciones entre estados de autenticación.

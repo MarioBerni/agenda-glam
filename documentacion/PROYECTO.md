@@ -177,26 +177,16 @@ Se recomienda utilizar el patrón BLoC (Business Logic Component) para la gesti�
 - Se ha creado un emulador de Android (Pixel 7 con Android 14) para pruebas.
 - El equipo está listo para iniciar el desarrollo del MVP (Producto Mínimo Viable).
 
-### Próximos Pasos
+### Implementaciones Realizadas
 
-#### Fase 1: MVP (2-3 meses)
-1. Implementar autenticación y gestión de usuarios
-2. Desarrollar perfiles básicos de negocios
-3. Crear sistema de búsqueda y reservas
-4. Implementar notificaciones básicas
-5. Diseñar y desarrollar UI principal
+El desarrollo del proyecto se ha organizado en oleadas de implementación, cada una enfocada en aspectos específicos de la aplicación. Hasta la fecha, se han completado las siguientes oleadas:
 
-#### Fase 2: Mejoras y Optimización (1-2 meses)
-1. Refinar la experiencia de usuario basada en feedback
-2. Implementar dashboards completos
-3. Añadir sistema de reseñas y calificaciones
-4. Optimizar rendimiento y tiempos de carga
-
-#### Fase 3: Funcionalidades Avanzadas (2-3 meses)
-1. Integrar pagos en línea
-2. Implementar análisis avanzado y reportes
-3. Desarrollar sistema de promociones y descuentos
-4. Añadir sincronización con calendarios externos
+1. **Oleada 1**: Estructura inicial del proyecto, configuración de Firebase y autenticación básica.
+2. **Oleada 2**: Optimización y modularización del código, implementación completa de autenticación con Firebase.
+3. **Oleada 3**: Mejora de la experiencia post-autenticación, integración con Firestore y manejo de perfiles de usuario.
+4. **Oleada 4**: Implementación de autenticación por teléfono y mejoras de diseño visual.
+5. **Oleada 5**: Mejoras en la interfaz de usuario para autenticación por teléfono y correcciones de código.
+6. **Oleada 6**: Sistema de consentimiento legal, versionado de documentos y páginas dedicadas para términos y condiciones.
 
 ## Plan de Pruebas
 
@@ -216,8 +206,38 @@ Se recomienda utilizar el patrón BLoC (Business Logic Component) para la gesti�
 - Validación de flujos completos de usuario
 - Verificación de requisitos funcionales
 
+## Documentación de Oleadas de Implementación
+
+### Propósito y Estructura
+
+Los archivos de oleadas de implementación (`OLEADA-IMPLEMENTACIONES-X.md`) tienen como objetivo documentar de manera detallada y estructurada las funcionalidades que ya han sido implementadas y confirmadas en el proyecto. Estos documentos:
+
+- **Registran el progreso real**: Documentan exclusivamente las implementaciones completadas y verificadas, no las planificadas o pendientes.
+- **Sirven como referencia técnica**: Proporcionan detalles sobre la arquitectura, patrones de diseño y decisiones técnicas tomadas.
+- **Facilitan la incorporación de nuevos desarrolladores**: Ofrecen una visión clara de cómo está construido el sistema.
+- **Ayudan en el mantenimiento**: Permiten entender rápidamente qué componentes existen y cómo interactúan.
+
+### Contenido de los Archivos de Oleadas
+
+Cada archivo de oleada típicamente incluye:
+
+1. **Resumen general**: Visión general de lo implementado en esa oleada.
+2. **Funcionalidades implementadas**: Lista detallada de características completadas.
+3. **Detalles técnicos**: Información sobre la implementación, patrones utilizados y componentes creados.
+4. **Archivos creados/modificados**: Registro de los cambios realizados en el código.
+5. **Problemas encontrados y soluciones**: Documentación de desafíos técnicos y cómo fueron resueltos.
+
+### Beneficios de la Documentación por Oleadas
+
+- **Trazabilidad**: Permite seguir la evolución del proyecto a lo largo del tiempo.
+- **Transparencia**: Proporciona una visión clara de lo que realmente está implementado.
+- **Calidad**: Ayuda a mantener estándares de documentación consistentes.
+- **Comunicación**: Facilita la comunicación entre miembros del equipo y stakeholders.
+
 ## Conclusión
 
 Agenda Glam tiene el potencial de transformar la gestión de servicios estéticos masculinos en Uruguay, ofreciendo una solución que simplifica la experiencia del cliente y potencia la eficiencia de los proveedores. Con un diseño intuitivo, un stack tecnológico escalable y un enfoque en la seguridad, esta plataforma está destinada a convertirse en un referente en el mercado.
 
-El proyecto cuenta con una base sólida en términos de concepto, planificación y tecnología seleccionada. La implementación por fases permitirá validar el producto con usuarios reales y ajustar la estrategia según sea necesario, maximizando las posibilidades de éxito en el mercado.
+El proyecto cuenta con una base sólida en términos de concepto, planificación y tecnología seleccionada. La implementación por oleadas ha permitido un desarrollo estructurado y bien documentado, facilitando la gestión del proyecto y asegurando la calidad del producto final.
+
+*Documentación actualizada: 20 de abril de 2025*

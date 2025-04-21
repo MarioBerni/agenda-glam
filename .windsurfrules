@@ -1,0 +1,85 @@
+<proyecto_contexto>
+# Agenda Glam - Aplicación de Reservas y Gestión para Estéticas
+- Aplicación móvil desarrollada en Flutter/Dart
+- Arquitectura limpia (Clean Architecture) con separación en capas
+- Usa Firebase para autenticación, almacenamiento y notificaciones
+- Sigue patrón BLoC para gestión de estado
+</proyecto_contexto>
+
+<convenciones_nomenclatura>
+# Convenciones de Nomenclatura
+- Clases: PascalCase (ej. UserRepository, LoginPage)
+- Variables/métodos: camelCase (ej. userProfile, fetchData)
+- Constantes: SNAKE_CASE mayúsculas (ej. API_KEY)
+- Archivos:
+  - Páginas: snake_case_page.dart (ej. login_page.dart)
+  - Widgets: snake_case.dart (ej. custom_button.dart)
+  - BLoCs: snake_case_bloc.dart (ej. auth_bloc.dart)
+- Usar nombres descriptivos en español para variables de UI y en inglés para nombres técnicos
+</convenciones_nomenclatura>
+
+<estilo_codigo>
+# Estilo de Código
+- Implementar widgets modulares y reutilizables
+- Seguir principios SOLID en todas las implementaciones
+- Mantener métodos concisos (máximo 30 líneas)
+- Documentar componentes públicos y clases principales
+- Priorizar el uso de constructores const cuando sea posible
+- Evitar nesting excesivo (máximo 3 niveles)
+- Usar getters en lugar de métodos sin parámetros
+- Preferir funciones asíncronas con async/await sobre .then()
+- Agrupar propiedades similares en clases/widgets
+</estilo_codigo>
+
+<patrones_flutter>
+# Patrones de Desarrollo Flutter
+- Separar widgets en componentes reutilizables y modulares
+- Usar StatelessWidget siempre que sea posible
+- Implementar BuildContext Extensions para funcionalidad común
+- Almacenar colores, textos y dimensiones como constantes
+- Encapsular llamadas a Firebase en repositories
+- Implementar Dependency Injection para testabilidad
+- Usar interfaces para servicios externos (Firebase, APIs)
+</patrones_flutter>
+
+<especificaciones_bloc>
+# Implementación de BLoC
+- Crear Events claramente definidos para cada acción de usuario
+- Mantener States inmutables y con copyWith
+- Implementar Equatable para comparación de estados y eventos
+- Manejar errores dentro del BLoC, nunca en la UI
+- Usar BlocConsumer solo cuando sea necesario escuchar y construir
+- Separar BLoCs por característica o dominio funcional
+- Mantener registro de eventos en modo desarrollo para depuración
+</especificaciones_bloc>
+
+<especificaciones_técnicas>
+# Especificaciones Técnicas
+- Verificar compatibilidad con Android API 21+ e iOS 12+
+- Diseñar UI para seguir la paleta de colores con tema oscuro (azul marino/dorado)
+- Implementar validaciones robustas en todos los formularios
+- Mantener la estructura modular en carpetas definida en ESTRUCTURA.md
+- Usar archivos de barril (barrel files) para simplificar importaciones
+- Implementar manejo de errores centralizado
+- Optimizar recursos de imágenes y assets
+</especificaciones_técnicas>
+
+<implementación_seguridad>
+# Seguridad e Integridad
+- Seguir mejores prácticas de Firebase para autenticación
+- Implementar verificación de usuario para acceso a datos sensibles
+- Validar entradas de usuario antes de enviarlas a la base de datos
+- Manejar excepciones de manera adecuada con mensajes claros para el usuario
+- No almacenar datos sensibles en SharedPreferences o similares
+- Asegurar reglas de Firestore para prevenir accesos no autorizados
+- Implementar tiempo de expiración para tokens y sesiones
+</implementación_seguridad>
+
+<principios_pruebas>
+# Principios de Testing
+- Escribir pruebas unitarias para repositories y servicios
+- Implementar pruebas de widget para componentes críticos de UI
+- Usar mocks para servicios externos (Firebase)
+- Mantener al menos 80% de cobertura en código de lógica de negocio
+- Separar configuración de pruebas en archivos helpers
+</principios_pruebas>
